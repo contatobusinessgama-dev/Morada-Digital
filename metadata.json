@@ -1,0 +1,8 @@
+{
+  "name": "Morada Digital | A Paz de Encontrar o Lugar Onde Você Pertence",
+  "description": "Morada Digital - Lançamento da nova plataforma para conectar você ao seu lar ideal com inovação, transparência, segurança jurídica e tranquilidade.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
