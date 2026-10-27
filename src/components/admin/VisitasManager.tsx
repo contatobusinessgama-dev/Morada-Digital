@@ -18,7 +18,9 @@ import {
   Check,
   Printer,
   ShieldCheck,
-  Smile
+  Smile,
+  Edit3,
+  Trash2
 } from 'lucide-react';
 import { useRealEstate } from '../../context/RealEstateContext';
 import { Visita, VisitaStatus } from '../../types';
@@ -30,6 +32,8 @@ export const VisitasManager: React.FC = () => {
     addVisita, 
     updateVisitaStatus, 
     addVisitaFeedback, 
+    updateVisita,
+    deleteVisita,
     properties, 
     team, 
     currentUser,
@@ -45,6 +49,11 @@ export const VisitasManager: React.FC = () => {
   const [feedbackVisita, setFeedbackVisita] = useState<Visita | null>(null);
   const [feedbackRating, setFeedbackRating] = useState<number>(5);
   const [feedbackComment, setFeedbackComment] = useState('');
+
+  // Edit Visit State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingVisita, setEditingVisita] = useState<Visita | null>(null);
+  const [visitaToDelete, setVisitaToDelete] = useState<Visita | null>(null);
 
   // New Visit Form
   const [newPropertyId, setNewPropertyId] = useState(properties[0]?.id || '');
@@ -354,20 +363,26 @@ export const VisitasManager: React.FC = () => {
                           <FileText className="w-4 h-4" />
                         </button>
 
-                        {/* Feedback Button if realized */}
-                        {visita.status === 'realizada' && (
-                          <button
-                            onClick={() => {
-                              setFeedbackVisita(visita);
-                              setFeedbackRating(visita.feedbackRating || 5);
-                              setFeedbackComment(visita.feedbackComment || '');
-                            }}
-                            className="p-1.5 text-slate-500 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
-                            title="Feedback da Visita"
-                          >
-                            <Smile className="w-4 h-4" />
-                          </button>
-                        )}
+                        {/* Edit Visit Button */}
+                        <button
+                          onClick={() => {
+                            setEditingVisita({ ...visita });
+                            setIsEditModalOpen(true);
+                          }}
+                          className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+                          title="Editar Visita"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+
+                        {/* Delete Visit Button */}
+                        <button
+                          onClick={() => setVisitaToDelete(visita)}
+                          className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                          title="Excluir Visita Definitivamente"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     </td>
 
@@ -665,6 +680,181 @@ export const VisitasManager: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: EDITAR VISITA (DIRETOR / ADM)                                      */}
+      {/* ========================================================================= */}
+      {isEditModalOpen && editingVisita && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 space-y-4 text-xs">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <Edit3 className="w-5 h-5 text-indigo-600" />
+                <div>
+                  <h3 className="font-bold text-slate-900 text-base">Editar Visita</h3>
+                  <span className="text-[11px] font-mono text-slate-500">{editingVisita.code} • {editingVisita.propertyCode}</span>
+                </div>
+              </div>
+              <button onClick={() => setIsEditModalOpen(false)} className="text-slate-400 hover:text-slate-700">✕</button>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                updateVisita(editingVisita.id, {
+                  date: editingVisita.date,
+                  time: editingVisita.time,
+                  leadOrClientName: editingVisita.leadOrClientName,
+                  leadOrClientPhone: editingVisita.leadOrClientPhone,
+                  keyLocation: editingVisita.keyLocation,
+                  status: editingVisita.status,
+                  notes: editingVisita.notes
+                });
+                setIsEditModalOpen(false);
+                setEditingVisita(null);
+              }}
+              className="space-y-4"
+            >
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Nome do Visitante</label>
+                  <input
+                    type="text"
+                    required
+                    value={editingVisita.leadOrClientName}
+                    onChange={e => setEditingVisita({ ...editingVisita, leadOrClientName: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-800"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Telefone WhatsApp</label>
+                  <input
+                    type="text"
+                    required
+                    value={editingVisita.leadOrClientPhone}
+                    onChange={e => setEditingVisita({ ...editingVisita, leadOrClientPhone: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-800"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Data</label>
+                  <input
+                    type="date"
+                    required
+                    value={editingVisita.date}
+                    onChange={e => setEditingVisita({ ...editingVisita, date: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-800"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Horário</label>
+                  <input
+                    type="time"
+                    required
+                    value={editingVisita.time}
+                    onChange={e => setEditingVisita({ ...editingVisita, time: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-800"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Status da Visita</label>
+                  <select
+                    value={editingVisita.status}
+                    onChange={e => setEditingVisita({ ...editingVisita, status: e.target.value as VisitaStatus })}
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-800 font-bold"
+                  >
+                    <option value="agendada">Agendada</option>
+                    <option value="confirmada">Confirmada</option>
+                    <option value="realizada">Realizada</option>
+                    <option value="cancelada">Cancelada</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Portaria / Chaves</label>
+                  <input
+                    type="text"
+                    value={editingVisita.keyLocation}
+                    onChange={e => setEditingVisita({ ...editingVisita, keyLocation: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-800"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Observações da Visita</label>
+                <textarea
+                  rows={2}
+                  value={editingVisita.notes || ''}
+                  onChange={e => setEditingVisita({ ...editingVisita, notes: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-800"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-md cursor-pointer"
+                >
+                  Salvar Alterações
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: EXCLUIR VISITA (CONFIRMAÇÃO)                                       */}
+      {/* ========================================================================= */}
+      {visitaToDelete && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 space-y-4 text-xs">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto">
+              <Trash2 className="w-6 h-6" />
+            </div>
+
+            <div className="text-center space-y-1">
+              <h3 className="font-bold text-base text-slate-900">Excluir Agendamento de Visita?</h3>
+              <p className="text-slate-500">
+                Deseja excluir a visita <strong>{visitaToDelete.code}</strong> para o cliente <strong>{visitaToDelete.leadOrClientName}</strong> no imóvel {visitaToDelete.propertyCode}?
+              </p>
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setVisitaToDelete(null)}
+                className="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  deleteVisita(visitaToDelete.id);
+                  setVisitaToDelete(null);
+                }}
+                className="w-1/2 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl shadow-md cursor-pointer"
+              >
+                Sim, Excluir
+              </button>
+            </div>
           </div>
         </div>
       )}

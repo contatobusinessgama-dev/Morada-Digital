@@ -11,16 +11,24 @@ import {
   Locacao,
   Comissao,
   FinancialTransaction,
-  MarketingCampaign
+  MarketingCampaign,
+  DEFAULT_ADMIN_PERMISSIONS,
+  DEFAULT_CORRETOR_PERMISSIONS,
+  AgencyFinancialSettings,
+  SocialMediaConfig,
+  DashboardConfig
 } from '../types';
 
 export const MORADA_BRAND = {
   name: 'Morada Digital',
   legalName: 'Morada Digital Intermediação Imobiliária Ltda.',
   tagline: 'A paz de encontrar o lugar onde você pertence.',
-  creci: 'CRECI Jurídico nº 104.900-J',
-  phone: '(31) 98427-9865',
-  phoneClean: '5531984279865',
+  creci: 'CRECI Jurídico nº 104.900-J/MG',
+  phone: '(31) 3357-3030', // Telefone Fixo Principal
+  landlinePhone: '(31) 3357-3030', // Telefone Fixo
+  whatsapp: '(31) 98427-9865', // Plantão WhatsApp
+  phoneClean: '3133573030',
+  whatsappClean: '5531984279865',
   email: 'contato@moradadigital.com.br',
   address: 'Rua Pinheiro, 264 - Arvoredo, Contagem - MG',
   cep: '32113-230',
@@ -29,462 +37,102 @@ export const MORADA_BRAND = {
   model: 'Imobiliária 100% Digital com Base Operacional',
   isLaunch: true,
   launchYear: 2026,
-  statusBadge: 'Lançamento Oficial',
-  logoUrl: 'https://media.base44.com/images/public/6aa346c7b405d3179f59123d/3f2a0105a_generated_image.png'
+  statusBadge: 'Lançamento Oficial 2026',
+  logoUrl: '/assets/morada-logo.svg',
+  heroBannerUrl: '/assets/aistudio/WhatsApp_Image_2026-10-20_at_23.26.06_d24aabb1.jpeg'
 };
 
 export const SHALOM_BRAND = MORADA_BRAND;
 
+/**
+ * BASE LIMPA COM APENAS 1 CASO DE EXEMPLO
+ * Permite que a imobiliária inicie a utilização imediatamente com dados reais,
+ * mantendo apenas 1 modelo de referência em cada módulo do sistema.
+ */
+
+// 1. IMÓVEL DE EXEMPLO (Suporta até 15 fotos)
 export const INITIAL_PROPERTIES: Property[] = [
   {
     id: 'prop-1',
-    code: 'SH-8041',
-    title: 'Penthouse Contemporânea com Vista Panorâmica e Terraço Zen',
-    description: 'Exclusiva cobertura duplex nos Jardins, projetada para proporcionar tranquilidade e bem-estar absoluto. Living com pé direito duplo integrado a um terraço verde com piscina aquecida de borda infinita, solário e espaço gourmet harmonioso. Automação residencial completa, 4 suítes máster com closet e 5 vagas demarcadas.',
-    type: 'cobertura',
+    code: 'MD-1001',
+    title: 'Casa de Alto Padrão com Varanda Gourmet e Piscina no Bairro Arvoredo',
+    description: 'Exclusiva residência de alto padrão no Bairro Arvoredo em Contagem/MG. Living amplo com pé direito duplo integrado à varanda gourmet e piscina com cascata. 4 suítes máster com marcenaria planejada, cozinha ampla com bancadas em granito, 4 vagas de garagem e segurança especializada 24h. Localização nobre próxima à base operacional da Morada Digital.',
+    type: 'casa_condominio',
     goal: 'venda',
     status: 'disponivel',
-    price: 6850000,
-    condoFee: 4200,
-    iptuAnnual: 28500,
+    price: 1850000,
+    condoFee: 680,
+    iptuAnnual: 2450,
     bedrooms: 4,
     suites: 4,
-    bathrooms: 6,
-    parkingSpots: 5,
-    totalArea: 480,
-    usableArea: 420,
-    neighborhood: 'Jardins',
-    city: 'São Paulo',
-    state: 'SP',
-    address: 'Alameda Lorena, 1420 - Cerqueira César',
-    coordinates: { lat: -23.5675, lng: -46.6663 },
-    features: ['Piscina Privativa', 'Varanda Gourmet', 'Automação', 'Ar Condicionado', 'Portaria 24h', 'Academia', 'Pet Friendly', 'Depósito Privativo', 'Espaço Zen'],
+    bathrooms: 5,
+    parkingSpots: 4,
+    totalArea: 360,
+    usableArea: 290,
+    neighborhood: 'Arvoredo',
+    city: 'Contagem',
+    state: 'MG',
+    address: 'Rua Pinheiro, 264 - Arvoredo',
+    coordinates: { lat: -19.9208, lng: -44.0538 },
+    features: [
+      'Piscina Privativa', 
+      'Varanda Gourmet', 
+      'Churrasqueira', 
+      'Portaria 24h', 
+      'Ar Condicionado', 
+      'Pet Friendly', 
+      'Acabamento Premium', 
+      'Armários Planejados'
+    ],
     images: [
       'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80'
     ],
     videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     brokerId: 'usr-1',
     brokerName: 'Rodrigo Mendonça',
     brokerPhone: '(31) 98427-9865',
-    brokerCreci: 'CRECI 189.442-F',
-    brokerAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
-    exclusive: true,
-    featured: true,
-    yearBuilt: 2022,
-    floor: 21,
-    portalsSynced: { zap: true, vivaReal: true, olx: true },
-    createdAt: '2026-03-10'
-  },
-  {
-    id: 'prop-2',
-    code: 'SH-5120',
-    title: 'Apartamento de Alto Padrão Reformado no Itaim Bibi',
-    description: 'Planta ampla com 225m² privativos, reformado com acabamentos nobres em madeira freijó e mármore travertino. Sala com 3 ambientes integrada à ampla varanda envidraçada com luz natural o dia todo. Edifício boutique com gerador total, quadra de tênis e segurança especializada 24h.',
-    type: 'apartamento',
-    goal: 'venda',
-    status: 'disponivel',
-    price: 3450000,
-    condoFee: 2800,
-    iptuAnnual: 14200,
-    bedrooms: 3,
-    suites: 3,
-    bathrooms: 4,
-    parkingSpots: 3,
-    totalArea: 280,
-    usableArea: 225,
-    neighborhood: 'Itaim Bibi',
-    city: 'São Paulo',
-    state: 'SP',
-    address: 'Rua Pedroso Alvarenga, 780',
-    coordinates: { lat: -23.5837, lng: -46.6789 },
-    features: ['Varanda Gourmet', 'Churrasqueira', 'Portaria 24h', 'Academia', 'Pet Friendly', 'Piscina Aquecida', 'Quadra de Tênis'],
-    images: [
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1200&q=80'
-    ],
-    brokerId: 'usr-2',
-    brokerName: 'Camila Vasconcelos',
-    brokerPhone: '(31) 98427-9865',
-    brokerCreci: 'CRECI 204.119-F',
-    brokerAvatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=250&q=80',
-    exclusive: true,
-    featured: true,
-    yearBuilt: 2021,
-    floor: 12,
-    portalsSynced: { zap: true, vivaReal: true, olx: false },
-    createdAt: '2026-03-15'
-  },
-  {
-    id: 'prop-3',
-    code: 'SH-3309',
-    title: 'Studio Design Mobiliado Próximo ao Metrô Fradique',
-    description: 'Conforto e praticidade para quem valoriza localização e bem-estar urbano. Totalmente mobiliado com marcenaria planejada sustentável, eletrodomésticos de primeira linha embutidos e fechadura biométrica.',
-    type: 'studio',
-    goal: 'venda',
-    status: 'disponivel',
-    price: 520000,
-    rentalPrice: 3800,
-    condoFee: 620,
-    iptuAnnual: 1800,
-    bedrooms: 1,
-    suites: 1,
-    bathrooms: 1,
-    parkingSpots: 1,
-    totalArea: 42,
-    usableArea: 38,
-    neighborhood: 'Pinheiros',
-    city: 'São Paulo',
-    state: 'SP',
-    address: 'Rua dos Pinheiros, 610',
-    coordinates: { lat: -23.5641, lng: -46.6892 },
-    features: ['Mobiliado', 'Ar Condicionado', 'Piscina Rooftop', 'Coworking Silencioso', 'Lavanderia Coletiva', 'Portaria 24h'],
-    images: [
-      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1536376072261-38c75010e6c9?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80'
-    ],
-    brokerId: 'usr-3',
-    brokerName: 'Lucas Arantes',
-    brokerPhone: '(31) 98427-9865',
-    brokerCreci: 'CRECI 162.830-F',
-    brokerAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=250&q=80',
-    exclusive: false,
-    featured: false,
-    yearBuilt: 2023,
-    floor: 8,
-    portalsSynced: { zap: true, vivaReal: true, olx: true },
-    createdAt: '2026-03-18'
-  },
-  {
-    id: 'prop-4',
-    code: 'SH-9201',
-    title: 'Residência Neoclássica com Paisagismo Tropical em Alphaville',
-    description: 'Mansão inspirada no bem-estar familiar, cercada pela natureza com projeto de paisagismo privativo. Área de lazer completa com quadra de beach tennis, sauna úmida, adega climatizada para 800 rótulos e espaço fogo.',
-    type: 'casa_condominio',
-    goal: 'venda',
-    status: 'reservado',
-    price: 8900000,
-    condoFee: 3100,
-    iptuAnnual: 22000,
-    bedrooms: 5,
-    suites: 5,
-    bathrooms: 7,
-    parkingSpots: 6,
-    totalArea: 950,
-    usableArea: 680,
-    neighborhood: 'Tamboré / Alphaville',
-    city: 'Barueri',
-    state: 'SP',
-    address: 'Alameda dos Jacarandás, Residencial 2',
-    coordinates: { lat: -23.4981, lng: -46.8524 },
-    features: ['Piscina Aquecida', 'Adega Climatizada', 'Sauna', 'Quadra Beach Tennis', 'Segurança Armada 24h', 'Energia Solar', 'Varanda Gourmet'],
-    images: [
-      'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80'
-    ],
-    brokerId: 'usr-1',
-    brokerName: 'Rodrigo Mendonça',
-    brokerPhone: '(31) 98427-9865',
-    brokerCreci: 'CRECI 189.442-F',
+    brokerCreci: 'CRECI 189.442-F/MG',
     brokerAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
     exclusive: true,
     featured: true,
     yearBuilt: 2024,
+    floor: 2,
     portalsSynced: { zap: true, vivaReal: true, olx: true },
-    createdAt: '2026-02-28'
-  },
-  {
-    id: 'prop-5',
-    code: 'SH-2244',
-    title: 'Apartamento Garden com Amplo Quintal em Moema Pássaros',
-    description: 'Viva a paz de uma casa com a segurança de um condomínio de luxo. Garden com 180m² de área descoberta privativa, gramado, jabuticabeira e deck com hidromassagem Jacuzzi.',
-    type: 'apartamento',
-    goal: 'locacao',
-    status: 'disponivel',
-    price: 2600000,
-    rentalPrice: 16500,
-    condoFee: 2400,
-    iptuAnnual: 9800,
-    bedrooms: 3,
-    suites: 2,
-    bathrooms: 4,
-    parkingSpots: 3,
-    totalArea: 320,
-    usableArea: 240,
-    neighborhood: 'Moema',
-    city: 'São Paulo',
-    state: 'SP',
-    address: 'Rua Canário, 910',
-    coordinates: { lat: -23.6042, lng: -46.6631 },
-    features: ['Garden Privativo', 'Hidromassagem', 'Pet Friendly', 'Varanda Gourmet', 'Portaria 24h', 'Piscina Condomínio'],
-    images: [
-      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1600573472550-8090b5e0745e?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80'
-    ],
-    brokerId: 'usr-2',
-    brokerName: 'Camila Vasconcelos',
-    brokerPhone: '(31) 98427-9865',
-    brokerCreci: 'CRECI 204.119-F',
-    brokerAvatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=250&q=80',
-    exclusive: false,
-    featured: false,
-    yearBuilt: 2020,
-    floor: 1,
-    portalsSynced: { zap: true, vivaReal: true, olx: true },
-    createdAt: '2026-03-22'
-  },
-  {
-    id: 'prop-6',
-    code: 'SH-7019',
-    title: 'Lançamento Icon Moema - Torre Única e Sky Pool no Rooftop',
-    description: 'Obras aceleradas. Projeto assinado por Aflalo/Gasperini com certificação de sustentabilidade e biofilia. Unidades de 145m² com 3 suítes, plantas flexíveis, tomada para carro elétrico em todas as vagas e piscina panorâmica a 100m de altura.',
-    type: 'apartamento',
-    goal: 'lancamento',
-    status: 'disponivel',
-    price: 1890000,
-    condoFee: 1200,
-    iptuAnnual: 4200,
-    bedrooms: 3,
-    suites: 3,
-    bathrooms: 4,
-    parkingSpots: 2,
-    totalArea: 145,
-    usableArea: 145,
-    neighborhood: 'Moema',
-    city: 'São Paulo',
-    state: 'SP',
-    address: 'Avenida Pavão, 450',
-    coordinates: { lat: -23.6019, lng: -46.6695 },
-    features: ['Sky Pool', 'Ponto Carro Elétrico', 'Academia Cia Athletica', 'Lounge Bar', 'Bicicletário', 'Spa', 'Varanda Gourmet'],
-    images: [
-      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1574362848149-11496d93a7c7?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=80'
-    ],
-    brokerId: 'usr-3',
-    brokerName: 'Lucas Arantes',
-    brokerPhone: '(31) 98427-9865',
-    brokerCreci: 'CRECI 162.830-F',
-    brokerAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=250&q=80',
-    exclusive: true,
-    featured: true,
-    yearBuilt: 2027,
-    floor: 18,
-    portalsSynced: { zap: true, vivaReal: true, olx: true },
-    createdAt: '2026-04-01'
+    createdAt: '2026-04-15'
   }
 ];
 
-export const INITIAL_LEADS: Lead[] = [
-  {
-    id: 'lead-101',
-    name: 'Dr. Fernando Albuquerque',
-    email: 'fernando.albuquerque@cardio.med.br',
-    phone: '(31) 98427-9865',
-    interestType: 'venda',
-    budgetMin: 5500000,
-    budgetMax: 7500000,
-    preferredNeighborhoods: ['Jardins', 'Itaim Bibi'],
-    preferredPropertyTypes: ['cobertura', 'apartamento'],
-    stage: 'proposta_enviada',
-    origin: 'portal_zap',
-    assignedBrokerId: 'usr-1',
-    assignedBrokerName: 'Rodrigo Mendonça',
-    assignedBrokerAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
-    propertyOfInterestId: 'prop-1',
-    propertyOfInterestTitle: 'Penthouse Contemporânea com Vista Panorâmica e Terraço Zen',
-    propertyOfInterestCode: 'SH-8041',
-    notes: 'Cliente médico cirurgião, busca privacidade e terraço com piscina. Fez proposta inicial de R$ 6.4M à vista.',
-    score: 'quente',
-    lastContactAt: 'Há 2 horas',
-    createdAt: '2026-04-12',
-    interactions: [
-      { id: 'i-1', date: '12/04/2026 10:15', type: 'whatsapp', description: 'Lead recebido via Portal ZAP solicitando informações da Penthouse.', author: 'Sistema (Webhook ZAP)' },
-      { id: 'i-2', date: '12/04/2026 11:30', type: 'ligacao', description: 'Primeiro contato realizado. Cliente qualificado, com liquidez imediata.', author: 'Rodrigo Mendonça' },
-      { id: 'i-3', date: '15/04/2026 15:00', type: 'visita', description: 'Visita realizada com a família. Adoraram a vista e a área de lazer.', author: 'Rodrigo Mendonça' },
-      { id: 'i-4', date: '18/04/2026 14:20', type: 'proposta', description: 'Formalizada proposta formal no valor de R$ 6.400.000 (sinal 20% + transferência bancária).', author: 'Rodrigo Mendonça' }
-    ]
-  },
-  {
-    id: 'lead-102',
-    name: 'Família Silva (Mariana & André)',
-    email: 'familia.silva@lex.com.br',
-    phone: '(31) 98427-9865',
-    interestType: 'venda',
-    budgetMin: 3000000,
-    budgetMax: 3800000,
-    preferredNeighborhoods: ['Itaim Bibi', 'Vila Nova Conceição'],
-    preferredPropertyTypes: ['apartamento'],
-    stage: 'visita_agendada',
-    origin: 'instagram_ads',
-    assignedBrokerId: 'usr-2',
-    assignedBrokerName: 'Camila Vasconcelos',
-    assignedBrokerAvatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=250&q=80',
-    propertyOfInterestId: 'prop-2',
-    propertyOfInterestTitle: 'Apartamento de Alto Padrão Reformado no Itaim Bibi',
-    propertyOfInterestCode: 'SH-5120',
-    notes: 'Casal com dois filhos pequenos buscando estabilidade, silêncio e harmonia no condomínio.',
-    score: 'quente',
-    lastContactAt: 'Há 5 horas',
-    visitDate: '2026-04-22T15:30',
-    createdAt: '2026-04-14',
-    interactions: [
-      { id: 'i-21', date: '14/04/2026', type: 'whatsapp', description: 'Clicou no anúncio da Morada Digital "Apartamentos com Luz Natural no Itaim".', author: 'Instagram Lead Ads' },
-      { id: 'i-22', date: '16/04/2026', type: 'ligacao', description: 'Alinhadas opções e agendada visita presencial para quarta-feira às 15h30.', author: 'Camila Vasconcelos' }
-    ]
-  },
-  {
-    id: 'lead-103',
-    name: 'Sr. Ricardo Menezes (Proprietário)',
-    email: 'ricardo.menezes@invest.com.br',
-    phone: '(31) 98427-9865',
-    interestType: 'venda',
-    budgetMin: 450000,
-    budgetMax: 600000,
-    preferredNeighborhoods: ['Pinheiros', 'Vila Madalena'],
-    preferredPropertyTypes: ['studio'],
-    stage: 'contato_realizado',
-    origin: 'site_direto',
-    assignedBrokerId: 'usr-3',
-    assignedBrokerName: 'Lucas Arantes',
-    assignedBrokerAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=250&q=80',
-    propertyOfInterestId: 'prop-3',
-    propertyOfInterestTitle: 'Studio Design Mobiliado Próximo ao Metrô',
-    propertyOfInterestCode: 'SH-3309',
-    notes: 'Investidor interessado em agilidade na venda e controle pelo painel.',
-    score: 'morno',
-    lastContactAt: 'Ontem',
-    createdAt: '2026-04-17',
-    interactions: [
-      { id: 'i-31', date: '17/04/2026', type: 'whatsapp', description: 'Enviou formulário no portal Morada Digital na página do Studio Pinheiros.', author: 'Portal Público' },
-      { id: 'i-32', date: '18/04/2026', type: 'whatsapp', description: 'Enviada análise de mercado com retorno líquido de 0.72% a.m.', author: 'Lucas Arantes' }
-    ]
-  },
-  {
-    id: 'lead-104',
-    name: 'Beatriz Fagundes Rocha',
-    email: 'beatriz.fagundes@gmail.com',
-    phone: '(31) 98427-9865',
-    interestType: 'locacao',
-    budgetMin: 12000,
-    budgetMax: 18000,
-    preferredNeighborhoods: ['Moema', 'Campo Belo'],
-    preferredPropertyTypes: ['apartamento'],
-    stage: 'novo',
-    origin: 'portal_vivareal',
-    assignedBrokerId: 'usr-2',
-    assignedBrokerName: 'Camila Vasconcelos',
-    assignedBrokerAvatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=250&q=80',
-    propertyOfInterestId: 'prop-5',
-    propertyOfInterestTitle: 'Apartamento Garden com Amplo Quintal em Moema',
-    propertyOfInterestCode: 'SH-2244',
-    notes: 'Possui 2 cachorros Golden Retriever, necessita de área verde privativa e silêncio.',
-    score: 'quente',
-    lastContactAt: 'Há 25 minutos',
-    createdAt: '2026-04-20',
-    interactions: [
-      { id: 'i-41', date: '20/04/2026 14:10', type: 'whatsapp', description: 'Lead novo chegado via VivaReal. SLA de primeiro atendimento: 10 minutos.', author: 'Morada Bot' }
-    ]
-  },
-  {
-    id: 'lead-105',
-    name: 'Carlos Eduardo Nogueira',
-    email: 'carlos.nogueira@agrobusiness.com.br',
-    phone: '(31) 98427-9865',
-    interestType: 'venda',
-    budgetMin: 8000000,
-    budgetMax: 10000000,
-    preferredNeighborhoods: ['Tamboré / Alphaville'],
-    preferredPropertyTypes: ['casa_condominio'],
-    stage: 'fechado_ganho',
-    origin: 'indicacao',
-    assignedBrokerId: 'usr-1',
-    assignedBrokerName: 'Rodrigo Mendonça',
-    assignedBrokerAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
-    propertyOfInterestId: 'prop-4',
-    propertyOfInterestTitle: 'Residência Neoclássica com Paisagismo Tropical',
-    propertyOfInterestCode: 'SH-9201',
-    notes: 'Venda concretizada em R$ 8.6M. Escritura pública formalizada com Due Diligence completa.',
-    score: 'quente',
-    lastContactAt: '3 dias atrás',
-    createdAt: '2026-03-01',
-    interactions: [
-      { id: 'i-51', date: '01/03/2026', type: 'nota', description: 'Atendimento qualificado via lista exclusiva de pré-lançamento.', author: 'Rodrigo Mendonça' },
-      { id: 'i-52', date: '15/03/2026', type: 'visita', description: 'Visita completa com arquiteto do comprador.', author: 'Rodrigo Mendonça' },
-      { id: 'i-53', date: '02/04/2026', type: 'proposta', description: 'Proposta de R$ 8.6M aceita pelo proprietário.', author: 'Rodrigo Mendonça' },
-      { id: 'i-54', date: '10/04/2026', type: 'nota', description: 'Contrato assinado e sinal compensado.', author: 'Jurídico Morada Digital' }
-    ]
-  }
-];
-
-export const INITIAL_PROPOSALS: Proposal[] = [
-  {
-    id: 'prop-rec-1',
-    code: 'MD-PROP-042',
-    leadId: 'lead-101',
-    leadName: 'Dr. Fernando Albuquerque',
-    leadPhone: '(31) 98427-9865',
-    propertyId: 'prop-1',
-    propertyCode: 'SH-8041',
-    propertyTitle: 'Penthouse Contemporânea com Vista Panorâmica e Terraço Zen',
-    propertyAskingPrice: 6850000,
-    offeredPrice: 6400000,
-    paymentMethod: 'a_vista',
-    downPayment: 1280000,
-    status: 'em_analise',
-    brokerId: 'usr-1',
-    brokerName: 'Rodrigo Mendonça',
-    commissionRate: 6,
-    commissionTotal: 384000,
-    commissionBrokerPart: 160000,
-    commissionAgencyPart: 224000,
-    validUntil: '2026-04-26',
-    notes: 'Cliente oferece R$ 1.280.000 de sinal e saldo em 30 dias na lavratura da escritura pública.',
-    createdAt: '2026-04-18'
-  },
-  {
-    id: 'prop-rec-2',
-    code: 'MD-PROP-039',
-    leadId: 'lead-105',
-    leadName: 'Carlos Eduardo Nogueira',
-    leadPhone: '(31) 98427-9865',
-    propertyId: 'prop-4',
-    propertyCode: 'SH-9201',
-    propertyTitle: 'Residência Neoclássica com Paisagismo Tropical',
-    propertyAskingPrice: 8900000,
-    offeredPrice: 8600000,
-    paymentMethod: 'a_vista',
-    downPayment: 2000000,
-    status: 'contrato_assinado',
-    brokerId: 'usr-1',
-    brokerName: 'Rodrigo Mendonça',
-    commissionRate: 6,
-    commissionTotal: 516000,
-    commissionBrokerPart: 215000,
-    commissionAgencyPart: 301000,
-    validUntil: '2026-04-05',
-    notes: 'Negócio 100% fechado. VGV expressivo para a imobiliária.',
-    createdAt: '2026-04-02'
-  }
-];
-
+// 2. EQUIPE DE EXEMPLO (Diretor e Adm Geral + Corretor Credenciado com CRECI)
 export const USERS_TEAM: User[] = [
   {
     id: 'usr-0',
-    name: 'Diretoria Morada Digital',
-    email: 'diretoria@moradadigital.com.br',
+    name: 'Daniel Gama',
+    email: 'daniel.gama@moradadigital.com.br',
     role: 'admin',
-    phone: '(31) 98427-9865',
-    creci: 'CRECI 104.900-J',
+    phone: '(31) 3357-3030',
+    creci: 'CRECI 68.165-F/MG',
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=250&q=80',
-    salesMonthVGV: 14800000,
-    salesGoal: 20000000
+    salesMonthVGV: 1850000,
+    salesGoal: 5000000,
+    cpf: '913.436.236-34',
+    pixKey: '91343623634',
+    pixKeyType: 'cpf',
+    commissionRate: 100,
+    rentalCommissionRate: 100,
+    status: 'ativo',
+    joinedDate: '01/01/2024',
+    specialties: ['Direção Geral', 'Gestão Estratégica & Comercial', 'Negócios Imobiliários & Jurídico'],
+    totalSalesVGV: 1850000,
+    paidCommissions: 111000,
+    pendingCommissions: 0,
+    bio: 'Diretor e Administrador da Morada Digital. CRECI 68.165.',
+    city: 'Contagem - MG',
+    permissions: DEFAULT_ADMIN_PERMISSIONS
   },
   {
     id: 'usr-1',
@@ -492,38 +140,299 @@ export const USERS_TEAM: User[] = [
     email: 'rodrigo.mendonca@moradadigital.com.br',
     role: 'corretor',
     phone: '(31) 98427-9865',
-    creci: 'CRECI 189.442-F',
+    creci: 'CRECI 189.442-F/MG',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
-    activeLeadsCount: 14,
-    salesMonthVGV: 8600000,
-    salesGoal: 10000000
-  },
-  {
-    id: 'usr-2',
-    name: 'Camila Vasconcelos',
-    email: 'camila.vasconcelos@moradadigital.com.br',
-    role: 'corretor',
-    phone: '(31) 98427-9865',
-    creci: 'CRECI 204.119-F',
-    avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=250&q=80',
-    activeLeadsCount: 19,
-    salesMonthVGV: 4200000,
-    salesGoal: 7000000
-  },
-  {
-    id: 'usr-3',
-    name: 'Lucas Arantes',
-    email: 'lucas.arantes@moradadigital.com.br',
-    role: 'corretor',
-    phone: '(31) 98427-9865',
-    creci: 'CRECI 162.830-F',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=250&q=80',
-    activeLeadsCount: 11,
-    salesMonthVGV: 1890000,
-    salesGoal: 4000000
+    activeLeadsCount: 1,
+    salesMonthVGV: 1850000,
+    salesGoal: 3000000,
+    cpf: '219.458.706-33',
+    pixKey: '219.458.706-33',
+    pixKeyType: 'cpf',
+    commissionRate: 45, // 45% do honorário da imobiliária
+    rentalCommissionRate: 50, // 50% do 1º aluguel
+    status: 'ativo',
+    joinedDate: '15/03/2024',
+    specialties: ['Alto Padrão', 'Condomínios Fechados', 'Bairro Arvoredo'],
+    totalSalesVGV: 1850000,
+    paidCommissions: 49950,
+    pendingCommissions: 48060,
+    city: 'Contagem / Belo Horizonte - MG',
+    permissions: DEFAULT_CORRETOR_PERMISSIONS
   }
 ];
 
+// 3. LEAD DE EXEMPLO
+export const INITIAL_LEADS: Lead[] = [
+  {
+    id: 'lead-101',
+    name: 'Dr. Fernando Albuquerque',
+    email: 'fernando.albuquerque@cardio.med.br',
+    phone: '(31) 98427-9865',
+    interestType: 'venda',
+    budgetMin: 1500000,
+    budgetMax: 2200000,
+    preferredNeighborhoods: ['Arvoredo', 'Cabral'],
+    preferredPropertyTypes: ['casa_condominio'],
+    stage: 'proposta_enviada',
+    origin: 'whatsapp_direto',
+    assignedBrokerId: 'usr-1',
+    assignedBrokerName: 'Rodrigo Mendonça',
+    assignedBrokerAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
+    propertyOfInterestId: 'prop-1',
+    propertyOfInterestTitle: 'Casa de Alto Padrão no Bairro Arvoredo',
+    propertyOfInterestCode: 'MD-1001',
+    notes: 'Cliente médico cirurgião, busca casa ampla com piscina e espaço gourmet para a família em Contagem. Fez proposta inicial com sinal facilitado.',
+    score: 'quente',
+    lastContactAt: 'Há 1 hora',
+    createdAt: '2026-04-16',
+    interactions: [
+      { id: 'i-1', date: '16/04/2026 10:15', type: 'whatsapp', description: 'Lead recebido via WhatsApp Oficial da Morada Digital interessado na casa do Bairro Arvoredo.', author: 'Atendimento Digital' },
+      { id: 'i-2', date: '17/04/2026 14:30', type: 'ligacao', description: 'Contato telefônico realizado com Dr. Fernando. Perfil qualificado com recursos próprios e financiamento pré-aprovado.', author: 'Rodrigo Mendonça' },
+      { id: 'i-3', date: '19/04/2026 15:00', type: 'visita', description: 'Visita guiada ao imóvel MD-1001 com a família. Excelente aceitação da área gourmet e suítes.', author: 'Rodrigo Mendonça' },
+      { id: 'i-4', date: '21/04/2026 11:20', type: 'proposta', description: 'Formalizada proposta formal no valor de R$ 1.780.000.', author: 'Rodrigo Mendonça' }
+    ]
+  }
+];
+
+// 4. PROPOSTA DE EXEMPLO
+export const INITIAL_PROPOSALS: Proposal[] = [
+  {
+    id: 'prop-rec-1',
+    code: 'MD-PROP-001',
+    leadId: 'lead-101',
+    leadName: 'Dr. Fernando Albuquerque',
+    leadPhone: '(31) 98427-9865',
+    propertyId: 'prop-1',
+    propertyCode: 'MD-1001',
+    propertyTitle: 'Casa de Alto Padrão com Varanda Gourmet e Piscina no Bairro Arvoredo',
+    propertyAskingPrice: 1850000,
+    offeredPrice: 1780000,
+    paymentMethod: 'financiamento',
+    downPayment: 360000,
+    status: 'em_analise',
+    brokerId: 'usr-1',
+    brokerName: 'Rodrigo Mendonça',
+    commissionRate: 6,
+    commissionTotal: 106800,
+    commissionBrokerPart: 48060,
+    commissionAgencyPart: 58740,
+    validUntil: '2026-04-30',
+    notes: 'Sinal de 20% + saldo financiado via Caixa / Itaú já com carta de crédito pré-aprovada.',
+    createdAt: '2026-04-21'
+  }
+];
+
+// 5. CLIENTE DE EXEMPLO
+export const INITIAL_CLIENTES: Cliente[] = [
+  {
+    id: 'cli-1',
+    name: 'Dr. Eduardo Siqueira',
+    email: 'eduardo.siqueira@medicina.br',
+    phone: '(31) 99872-3341',
+    cpfCnpj: '249.810.748-12',
+    type: 'comprador',
+    status: 'em_negociacao',
+    budgetMax: 2000000,
+    preferredNeighborhoods: ['Arvoredo', 'Cabral', 'Eldorado'],
+    notes: 'Médico comprador qualificado buscando imóvel pronto para morar no Bairro Arvoredo.',
+    city: 'Contagem - MG',
+    createdAt: '2026-04-10'
+  }
+];
+
+// 6. VISITA DE EXEMPLO
+export const INITIAL_VISITAS: Visita[] = [
+  {
+    id: 'vis-1',
+    code: 'VIS-1001',
+    propertyId: 'prop-1',
+    propertyCode: 'MD-1001',
+    propertyTitle: 'Casa de Alto Padrão no Bairro Arvoredo',
+    propertyAddress: 'Rua Pinheiro, 264 - Arvoredo, Contagem - MG',
+    leadOrClientName: 'Dr. Eduardo Siqueira',
+    leadOrClientPhone: '(31) 99872-3341',
+    brokerId: 'usr-1',
+    brokerName: 'Rodrigo Mendonça',
+    date: '2026-04-23',
+    time: '15:30',
+    status: 'agendada',
+    keyLocation: 'Base Operacional Morada Digital (Rua Pinheiro, 264 - Arvoredo)',
+    termSigned: false,
+    notes: 'Visita agendada com envio prévio do catálogo digital ao cliente.',
+    createdAt: '2026-04-21'
+  }
+];
+
+// 7. AGENDA DE EXEMPLO
+export const INITIAL_AGENDA: AgendaEvent[] = [
+  {
+    id: 'age-1',
+    title: 'Visita Imóvel MD-1001 - Dr. Eduardo Siqueira',
+    type: 'visita',
+    date: '2026-04-23',
+    time: '15:30',
+    brokerId: 'usr-1',
+    brokerName: 'Rodrigo Mendonça',
+    clientName: 'Dr. Eduardo Siqueira',
+    location: 'Rua Pinheiro, 264 - Arvoredo, Contagem',
+    notes: 'Apresentação completa das 4 suítes e área de lazer com piscina.',
+    completed: false
+  }
+];
+
+// 8. CONTRATO DE EXEMPLO
+export const INITIAL_CONTRATOS: Contrato[] = [
+  {
+    id: 'ctr-1',
+    code: 'CTR-2026-001',
+    type: 'venda',
+    propertyId: 'prop-1',
+    propertyCode: 'MD-1001',
+    propertyTitle: 'Casa de Alto Padrão no Bairro Arvoredo',
+    clientName: 'Dr. Fernando Albuquerque',
+    clientCpf: '219.458.706-33',
+    ownerName: 'Espólio Morada Patrimonial Ltda',
+    ownerCpf: '14.882.190/0001-34',
+    brokerName: 'Rodrigo Mendonça',
+    value: 1780000,
+    warrantyType: 'nenhuma',
+    adjustmentIndex: 'IPCA',
+    startDate: '2026-04-21',
+    endDate: '2026-05-21',
+    status: 'minuta',
+    electronicSignatureUrl: 'https://zapsign.co/doc/ctr-2026-001',
+    notes: 'Minuta de promessa de compra e venda elaborada conforme arts. 722 a 729 do Código Civil Brasileiro.'
+  }
+];
+
+// 9. LOCAÇÃO DE EXEMPLO
+export const INITIAL_LOCACOES: Locacao[] = [
+  {
+    id: 'loc-1',
+    code: 'LOC-1001',
+    propertyId: 'prop-1',
+    propertyCode: 'MD-1001',
+    propertyTitle: 'Casa de Alto Padrão com Piscina - Arvoredo',
+    propertyAddress: 'Rua Pinheiro, 264 - Arvoredo, Contagem - MG',
+    tenantName: 'Carlos Alberto Mendonça',
+    tenantPhone: '(31) 98455-1122',
+    ownerName: 'Morada Administração Patrimonial',
+    ownerPhone: '(31) 98427-9865',
+    monthlyRent: 8500,
+    condoFee: 680,
+    iptuMonthly: 204,
+    adminFeePercent: 8,
+    adminFeeValue: 680,
+    ownerNetTransfer: 7820,
+    paymentDueDay: 10,
+    currentMonthStatus: 'pago',
+    lastPaymentDate: '2026-04-10',
+    contractEndDate: '2028-04-09',
+    nextReadjustmentDate: '2027-04-01',
+    warranty: 'Seguro Fiança Porto Seguro'
+  }
+];
+
+// 10. COMISSÃO DE EXEMPLO
+export const INITIAL_COMISSOES: Comissao[] = [
+  {
+    id: 'com-1',
+    code: 'COM-1001',
+    dealType: 'venda',
+    propertyCode: 'MD-1001',
+    propertyTitle: 'Casa de Alto Padrão no Bairro Arvoredo',
+    totalDealValue: 1780000,
+    totalCommissionRate: 6,
+    totalCommissionValue: 106800,
+    agencyShareRate: 3.3,
+    agencyShareValue: 58740,
+    brokerId: 'usr-1',
+    brokerName: 'Rodrigo Mendonça',
+    brokerShareRate: 2.7,
+    brokerShareValue: 48060,
+    status: 'a_receber',
+    dealDate: '2026-04-21'
+  }
+];
+
+// 11. FINANCEIRO DE EXEMPLO
+export const INITIAL_FINANCIAL: FinancialTransaction[] = [
+  {
+    id: 'fin-1',
+    description: 'Honorários de Intermediação Imobiliária (MD-1001)',
+    category: 'comissao_venda',
+    type: 'receita',
+    amount: 106800,
+    date: '2026-04-21',
+    dueDate: '2026-04-30',
+    status: 'pendente',
+    paymentMethod: 'ted'
+  }
+];
+
+// 12. MARKETING DE EXEMPLO
+export const INITIAL_MARKETING: MarketingCampaign[] = [
+  {
+    id: 'mkt-1',
+    name: 'Lançamento Oficial Morada Digital - Bairro Arvoredo & Região Metropolitana',
+    channel: 'meta_ads',
+    budget: 3500,
+    spent: 1200,
+    leadsGenerated: 48,
+    cpl: 25.00,
+    roas: 14.2,
+    status: 'ativa',
+    headline: 'Descubra a tranquilidade de encontrar seu lar no Bairro Arvoredo com a Morada Digital.'
+  }
+];
+
+export const DEFAULT_FINANCIAL_SETTINGS: AgencyFinancialSettings = {
+  defaultSalesCommissionRate: 6.0,
+  agencySplitPercent: 55.0,
+  brokerSplitPercent: 45.0,
+  defaultRentalAdminFeePercent: 8.0,
+  bankName: 'Banco Itaú Unibanco S.A.',
+  bankCode: '341',
+  agencyNumber: '3182',
+  accountNumber: '48920-1',
+  accountHolder: 'Morada Digital Negócios Imobiliários Ltda',
+  cnpj: '31.284.992/0001-44',
+  pixKey: 'financeiro@moradadigital.com.br',
+  pixKeyType: 'email',
+  escrowAccountNotes: 'Conta caução e repasse com liquidação D+1 automatizada via Pix e TED.'
+};
+
+export const DEFAULT_SOCIAL_MEDIA_CONFIG: SocialMediaConfig = {
+  instagramUrl: 'https://instagram.com/moradadigital.imoveis',
+  facebookUrl: 'https://facebook.com/moradadigital.mg',
+  youtubeUrl: 'https://youtube.com/@moradadigital.oficial',
+  tiktokUrl: 'https://tiktok.com/@moradadigital',
+  linkedinUrl: 'https://linkedin.com/company/morada-digital-imoveis',
+  whatsappBusinessNumber: '(31) 98427-9865',
+  whatsappDirectLink: 'https://wa.me/5531984279865?text=Ol%C3%A1%2C%20gostaria%20de%20informa%C3%A7%C3%B5es%20sobre%20os%20im%C3%B3veis.',
+  bioSlogan: 'Morada Digital • 100% Digital • Imóveis selecionados em Contagem e Grande BH.',
+  metaPixelId: 'PIXEL-MD-882914-CONTAGEM',
+  googleAnalyticsId: 'G-MD94820194',
+  googleTagManagerId: 'GTM-MD84920'
+};
+
+export const DEFAULT_DASHBOARD_CONFIG: DashboardConfig = {
+  layoutDensity: 'padrao',
+  monthlyTargetVGV: 10000000,
+  monthlyPropertiesTarget: 10,
+  widgets: {
+    kpis: true,
+    chartPropertiesVolume: true,
+    chartOpenSales: true,
+    chartBrokerPerformance: true,
+    chartPortfolioDistribution: true,
+    criticalDeals: true,
+    quickActions: true,
+    conversionTargetBanner: true
+  }
+};
+
+// ESTADO INICIAL DE FILTROS DO SITE PÚBLICO
 export const INITIAL_FILTER_STATE: SearchFilterState = {
   goal: 'venda',
   type: 'todos',
@@ -537,581 +446,4 @@ export const INITIAL_FILTER_STATE: SearchFilterState = {
   features: [],
   sortBy: 'relevancia'
 };
-
-export const INITIAL_CLIENTES: Cliente[] = [
-  {
-    id: 'cli-1',
-    name: 'Dr. Eduardo Siqueira',
-    email: 'eduardo.siqueira@medicina.usp.br',
-    phone: '(31) 99872-3341',
-    cpfCnpj: '249.810.748-12',
-    type: 'comprador',
-    status: 'em_negociacao',
-    budgetMax: 7000000,
-    preferredNeighborhoods: ['Jardins', 'Vila Nova Conceição', 'Moema'],
-    notes: 'Médico cirurgião, procura cobertura duplex ou casa de alto padrão com terraço e spa. Exige 4 vagas.',
-    city: 'São Paulo',
-    createdAt: '2026-03-10'
-  },
-  {
-    id: 'cli-2',
-    name: 'Mariana Duarte Prado',
-    email: 'mariana.prado@duarteadvocacia.com',
-    phone: '(31) 98114-9920',
-    cpfCnpj: '183.920.401-90',
-    type: 'proprietario',
-    status: 'ativo',
-    budgetMax: 3500000,
-    preferredNeighborhoods: ['Itaim Bibi', 'Pinheiros'],
-    notes: 'Proprietária do apartamento no Itaim Bibi (MD-2910). Aberta a negociação para permuta parcial.',
-    city: 'São Paulo',
-    createdAt: '2026-02-18'
-  },
-  {
-    id: 'cli-3',
-    name: 'Carlos Alberto Mendonça',
-    email: 'carlos.mendonca@logistica.com.br',
-    phone: '(31) 98455-1122',
-    cpfCnpj: '098.341.218-55',
-    type: 'locatario',
-    status: 'contrato_assinado',
-    budgetMax: 18000,
-    preferredNeighborhoods: ['Moema', 'Campo Belo'],
-    notes: 'Diretor de multinacional em Contagem/BH, contrato de locação ativo no Garden Moema.',
-    city: 'Contagem',
-    createdAt: '2026-01-20'
-  },
-  {
-    id: 'cli-4',
-    name: 'Beatriz Vasconcellos Rezende',
-    email: 'beatriz.rezende@inova.tech',
-    phone: '(31) 97123-8844',
-    cpfCnpj: '312.449.810-09',
-    type: 'investidor',
-    status: 'ativo',
-    budgetMax: 5000000,
-    preferredNeighborhoods: ['Moema', 'Pinheiros', 'Itaim'],
-    notes: 'Investidora focada em studios e apartamentos de 1 e 2 dormitórios para renda em locação com yield > 0.65% a.m.',
-    city: 'São Paulo',
-    createdAt: '2026-03-28'
-  },
-  {
-    id: 'cli-5',
-    name: 'Fernando Augusto Lima',
-    email: 'fernando.lima@grupolima.com.br',
-    phone: '(31) 98844-3321',
-    cpfCnpj: '542.190.871-33',
-    type: 'comprador',
-    status: 'em_negociacao',
-    budgetMax: 4800000,
-    preferredNeighborhoods: ['Cidade Jardim', 'Morumbi', 'Granja Viana'],
-    notes: 'Empresário do ramo industrial em Contagem/MG. Busca casa em condomínio fechado com ampla área verde.',
-    city: 'Contagem',
-    createdAt: '2026-04-02'
-  }
-];
-
-export const INITIAL_VISITAS: Visita[] = [
-  {
-    id: 'vis-1',
-    code: 'VIS-2041',
-    propertyId: 'prop-1',
-    propertyCode: 'MD-8041',
-    propertyTitle: 'Penthouse Contemporânea com Vista Panorâmica e Terraço Zen',
-    propertyAddress: 'Alameda Lorena, 1420 - Cerqueira César, São Paulo',
-    leadOrClientName: 'Dr. Eduardo Siqueira',
-    leadOrClientPhone: '(31) 99872-3341',
-    brokerId: 'usr-1',
-    brokerName: 'Rodrigo Mendonça',
-    date: '2026-04-22',
-    time: '15:30',
-    status: 'confirmada',
-    keyLocation: 'Portaria Social com identificação prévia da Morada Digital',
-    feedbackRating: 5,
-    feedbackComment: 'Cliente adorou a área externa e o pé direito duplo. Solicitou minuta de proposta com desconto de 4%.',
-    termSigned: true,
-    notes: 'Segunda visita acompanhada pela arquiteta da família.',
-    createdAt: '2026-04-18'
-  },
-  {
-    id: 'vis-2',
-    code: 'VIS-2042',
-    propertyId: 'prop-2',
-    propertyCode: 'MD-9214',
-    propertyTitle: 'Residência Biofílica Integrada à Natureza em Condomínio Fechado',
-    propertyAddress: 'Rua das Quaresmeiras, 340 - Fazenda Boa Vista',
-    leadOrClientName: 'Fernando Augusto Lima',
-    leadOrClientPhone: '(31) 98844-3321',
-    brokerId: 'usr-1',
-    brokerName: 'Rodrigo Mendonça',
-    date: '2026-04-23',
-    time: '10:00',
-    status: 'agendada',
-    keyLocation: 'Base Operacional Morada Digital (Rua Pinheiro, 264 - Arvoredo, Contagem)',
-    termSigned: false,
-    notes: 'Agendamento confirmado via WhatsApp oficial (31) 98427-9865. Corretor levará termo digital no tablet.',
-    createdAt: '2026-04-19'
-  },
-  {
-    id: 'vis-3',
-    code: 'VIS-2043',
-    propertyId: 'prop-3',
-    propertyCode: 'MD-2910',
-    propertyTitle: 'Apartamento de Alto Padrão no Coração do Itaim Bibi',
-    propertyAddress: 'Rua Joaquim Floriano, 870 - Itaim Bibi, São Paulo',
-    leadOrClientName: 'Guilherme Peixoto',
-    leadOrClientPhone: '(31) 99312-7711',
-    brokerId: 'usr-2',
-    brokerName: 'Camila Vasconcelos',
-    date: '2026-04-20',
-    time: '17:00',
-    status: 'realizada',
-    keyLocation: 'Zeladoria do Condomínio (autorização liberada pelo proprietário via app)',
-    feedbackRating: 4,
-    feedbackComment: 'Achou a planta excelente e muito iluminada. Quer verificar se o condomínio aceita proposta parcelada.',
-    termSigned: true,
-    notes: 'Visita realizada com sucesso, sem atrasos.',
-    createdAt: '2026-04-16'
-  },
-  {
-    id: 'vis-4',
-    code: 'VIS-2044',
-    propertyId: 'prop-5',
-    propertyCode: 'MD-5520',
-    propertyTitle: 'Apartamento Garden com Amplo Quintal em Moema Pássaros',
-    propertyAddress: 'Rua Canário, 910 - Moema, São Paulo',
-    leadOrClientName: 'Carlos Alberto Mendonça',
-    leadOrClientPhone: '(31) 98455-1122',
-    brokerId: 'usr-2',
-    brokerName: 'Camila Vasconcelos',
-    date: '2026-04-14',
-    time: '14:00',
-    status: 'realizada',
-    keyLocation: 'Portaria Social Moema Pássaros',
-    feedbackRating: 5,
-    feedbackComment: 'Cliente aprovou imediatamente a locação. Proposta aceita e contrato em vigor.',
-    termSigned: true,
-    notes: 'Cliente já se mudou no início da semana.',
-    createdAt: '2026-04-10'
-  },
-  {
-    id: 'vis-5',
-    code: 'VIS-2045',
-    propertyId: 'prop-6',
-    propertyCode: 'MD-7019',
-    propertyTitle: 'Lançamento Icon Moema - Torre Única e Sky Pool no Rooftop',
-    propertyAddress: 'Avenida Pavão, 450 - Moema, São Paulo',
-    leadOrClientName: 'Beatriz Vasconcellos Rezende',
-    leadOrClientPhone: '(31) 97123-8844',
-    brokerId: 'usr-3',
-    brokerName: 'Lucas Arantes',
-    date: '2026-04-24',
-    time: '16:00',
-    status: 'agendada',
-    keyLocation: 'Stand de Vendas & Decorado Morada Digital',
-    termSigned: false,
-    notes: 'Interesse em 2 unidades para investimento e locação corporativa.',
-    createdAt: '2026-04-20'
-  }
-];
-
-export const INITIAL_AGENDA: AgendaEvent[] = [
-  {
-    id: 'age-1',
-    title: 'Visita Penthouse Jardins - Dr. Eduardo Siqueira',
-    type: 'visita',
-    date: '2026-04-22',
-    time: '15:30',
-    brokerId: 'usr-1',
-    brokerName: 'Rodrigo Mendonça',
-    clientName: 'Dr. Eduardo Siqueira',
-    location: 'Alameda Lorena, 1420',
-    notes: 'Levar termo de visita digital e minuta da proposta pré-aprovada.',
-    completed: false
-  },
-  {
-    id: 'age-2',
-    title: 'Vistoria Inicial de Entrada - Casa Alphaville',
-    type: 'vistoria',
-    date: '2026-04-22',
-    time: '11:00',
-    brokerId: 'usr-2',
-    brokerName: 'Camila Vasconcelos',
-    clientName: 'Roberto Nogueira',
-    location: 'Alameda dos Ipês, 88 - Alphaville',
-    notes: 'Fotos de conferência de acabamentos e teste de eletrodomésticos.',
-    completed: false
-  },
-  {
-    id: 'age-3',
-    title: 'Assinatura Eletrônica Contrato Venda MD-2910',
-    type: 'assinatura',
-    date: '2026-04-23',
-    time: '14:00',
-    brokerId: 'usr-1',
-    brokerName: 'Rodrigo Mendonça',
-    clientName: 'Mariana Duarte Prado',
-    location: 'Plataforma Morada Digital (DocuSign / ZapSign)',
-    notes: 'Validação jurídica concluída pelo departamento de compliance.',
-    completed: false
-  },
-  {
-    id: 'age-4',
-    title: 'Reunião de Alinhamento Comercial e Lançamentos 2026',
-    type: 'reuniao',
-    date: '2026-04-24',
-    time: '09:00',
-    brokerId: 'usr-1',
-    brokerName: 'Equipe Morada Digital',
-    location: 'Base Operacional (Rua Pinheiro, 264 - Contagem) / Google Meet',
-    notes: 'Definição de metas semanais de visitas e leads de alto ticket.',
-    completed: false
-  }
-];
-
-export const INITIAL_CONTRATOS: Contrato[] = [
-  {
-    id: 'ctr-1',
-    code: 'CTR-2026-081',
-    type: 'venda',
-    propertyId: 'prop-3',
-    propertyCode: 'MD-2910',
-    propertyTitle: 'Apartamento de Alto Padrão no Coração do Itaim Bibi',
-    clientName: 'Mariana Duarte Prado',
-    clientCpf: '183.920.401-90',
-    ownerName: 'Espólio Renato Albuquerque',
-    ownerCpf: '041.882.190-34',
-    brokerName: 'Camila Vasconcelos',
-    value: 3100000,
-    warrantyType: 'nenhuma',
-    adjustmentIndex: 'IPCA',
-    startDate: '2026-04-18',
-    endDate: '2026-05-18',
-    status: 'aguardando_assinatura',
-    electronicSignatureUrl: 'https://zapsign.co/doc/ctr-2026-081',
-    notes: 'Cláusula de escritura definitiva e liberação do sinal via conta escrow.'
-  },
-  {
-    id: 'ctr-2',
-    code: 'CTR-2026-074',
-    type: 'locacao_residencial',
-    propertyId: 'prop-5',
-    propertyCode: 'MD-5520',
-    propertyTitle: 'Apartamento Garden com Amplo Quintal em Moema Pássaros',
-    clientName: 'Carlos Alberto Mendonça',
-    clientCpf: '098.341.218-55',
-    ownerName: 'Juliana Paes Barreto',
-    ownerCpf: '229.418.902-81',
-    brokerName: 'Camila Vasconcelos',
-    value: 594000, // 36 meses
-    monthlyRent: 16500,
-    warrantyType: 'seguro_fianca',
-    adjustmentIndex: 'IPCA',
-    startDate: '2026-04-01',
-    endDate: '2029-03-31',
-    status: 'vigente',
-    signedAt: '2026-03-29',
-    notes: 'Apólice Porto Seguro Fiança nº 849.201 vinculada ao contrato.'
-  },
-  {
-    id: 'ctr-3',
-    code: 'CTR-2026-062',
-    type: 'venda',
-    propertyId: 'prop-4',
-    propertyCode: 'MD-3091',
-    propertyTitle: 'Casa Contemporânea em Condomínio Alphaville',
-    clientName: 'Renato Faria Silveira',
-    clientCpf: '411.092.381-00',
-    ownerName: 'Construtora Horizonte Verde Ltda',
-    ownerCpf: '12.894.201/0001-94',
-    brokerName: 'Rodrigo Mendonça',
-    value: 4500000,
-    warrantyType: 'nenhuma',
-    adjustmentIndex: 'INPC',
-    startDate: '2026-03-12',
-    endDate: '2026-04-12',
-    status: 'assinado',
-    signedAt: '2026-03-24',
-    notes: 'Escritura lavrada no 2º Cartório de Notas. Comissão liquidada integralmente.'
-  }
-];
-
-export const INITIAL_LOCACOES: Locacao[] = [
-  {
-    id: 'loc-1',
-    code: 'LOC-4401',
-    propertyId: 'prop-5',
-    propertyCode: 'MD-5520',
-    propertyTitle: 'Apartamento Garden com Quintal em Moema',
-    propertyAddress: 'Rua Canário, 910 - Apto 12 - Moema, SP',
-    tenantName: 'Carlos Alberto Mendonça',
-    tenantPhone: '(31) 98455-1122',
-    ownerName: 'Juliana Paes Barreto',
-    ownerPhone: '(31) 99120-4499',
-    monthlyRent: 16500,
-    condoFee: 2400,
-    iptuMonthly: 816,
-    adminFeePercent: 8,
-    adminFeeValue: 1320,
-    ownerNetTransfer: 15180,
-    paymentDueDay: 10,
-    currentMonthStatus: 'pago',
-    lastPaymentDate: '2026-04-09',
-    contractEndDate: '2029-03-31',
-    nextReadjustmentDate: '2027-04-01',
-    warranty: 'Seguro Fiança Porto Seguro'
-  },
-  {
-    id: 'loc-2',
-    code: 'LOC-4402',
-    propertyId: 'prop-7',
-    propertyCode: 'MD-1180',
-    propertyTitle: 'Studio Mobiliado e Decorado perto da Faria Lima',
-    propertyAddress: 'Rua Butantã, 205 - Pinheiros, SP',
-    tenantName: 'Thiago Valente Costa',
-    tenantPhone: '(31) 98711-2299',
-    ownerName: 'Beatriz Vasconcellos Rezende',
-    ownerPhone: '(31) 97123-8844',
-    monthlyRent: 4200,
-    condoFee: 650,
-    iptuMonthly: 180,
-    adminFeePercent: 10,
-    adminFeeValue: 420,
-    ownerNetTransfer: 3780,
-    paymentDueDay: 15,
-    currentMonthStatus: 'pago',
-    lastPaymentDate: '2026-04-14',
-    contractEndDate: '2027-04-14',
-    nextReadjustmentDate: '2027-04-01',
-    warranty: 'Título de Capitalização (6 aluguéis)'
-  },
-  {
-    id: 'loc-3',
-    code: 'LOC-4403',
-    propertyId: 'prop-8',
-    propertyCode: 'MD-3340',
-    propertyTitle: 'Conjunto Comercial 180m² - Edifício Prime Business',
-    propertyAddress: 'Avenida Amazonas, 1200 - Contagem, MG',
-    tenantName: 'Inovação Digital Consultoria Ltda',
-    tenantPhone: '(31) 99344-0012',
-    ownerName: 'Dr. Marcos Valadares',
-    ownerPhone: '(31) 98877-2233',
-    monthlyRent: 9500,
-    condoFee: 1800,
-    iptuMonthly: 490,
-    adminFeePercent: 8,
-    adminFeeValue: 760,
-    ownerNetTransfer: 8740,
-    paymentDueDay: 20,
-    currentMonthStatus: 'em_aberto',
-    contractEndDate: '2028-02-28',
-    nextReadjustmentDate: '2027-03-01',
-    warranty: 'Fiador com 2 Imóveis Próprios'
-  }
-];
-
-export const INITIAL_COMISSOES: Comissao[] = [
-  {
-    id: 'com-1',
-    code: 'COM-1091',
-    dealType: 'venda',
-    propertyCode: 'MD-3091',
-    propertyTitle: 'Casa Contemporânea Alphaville',
-    totalDealValue: 4500000,
-    totalCommissionRate: 6,
-    totalCommissionValue: 270000,
-    agencyShareRate: 3.0,
-    agencyShareValue: 135000,
-    brokerId: 'usr-1',
-    brokerName: 'Rodrigo Mendonça',
-    brokerShareRate: 2.0,
-    brokerShareValue: 90000,
-    captadorBrokerId: 'usr-2',
-    captadorBrokerName: 'Camila Vasconcelos',
-    captadorShareRate: 1.0,
-    captadorShareValue: 45000,
-    status: 'pago',
-    dealDate: '2026-03-24',
-    paymentDate: '2026-04-05'
-  },
-  {
-    id: 'com-2',
-    code: 'COM-1092',
-    dealType: 'venda',
-    propertyCode: 'MD-2910',
-    propertyTitle: 'Apartamento de Alto Padrão no Itaim Bibi',
-    totalDealValue: 3100000,
-    totalCommissionRate: 6,
-    totalCommissionValue: 186000,
-    agencyShareRate: 3.0,
-    agencyShareValue: 93000,
-    brokerId: 'usr-2',
-    brokerName: 'Camila Vasconcelos',
-    brokerShareRate: 2.5,
-    brokerShareValue: 77500,
-    captadorBrokerId: 'usr-1',
-    captadorBrokerName: 'Rodrigo Mendonça',
-    captadorShareRate: 0.5,
-    captadorShareValue: 15500,
-    status: 'liberado',
-    dealDate: '2026-04-18'
-  },
-  {
-    id: 'com-3',
-    code: 'COM-1093',
-    dealType: 'locacao',
-    propertyCode: 'MD-5520',
-    propertyTitle: 'Apartamento Garden Moema Pássaros',
-    totalDealValue: 16500,
-    totalCommissionRate: 100, // 1º aluguel integral
-    totalCommissionValue: 16500,
-    agencyShareRate: 50,
-    agencyShareValue: 8250,
-    brokerId: 'usr-2',
-    brokerName: 'Camila Vasconcelos',
-    brokerShareRate: 50,
-    brokerShareValue: 8250,
-    status: 'pago',
-    dealDate: '2026-03-29',
-    paymentDate: '2026-04-10'
-  },
-  {
-    id: 'com-4',
-    code: 'COM-1094',
-    dealType: 'venda',
-    propertyCode: 'MD-8041',
-    propertyTitle: 'Penthouse Contemporânea nos Jardins',
-    totalDealValue: 6600000,
-    totalCommissionRate: 6,
-    totalCommissionValue: 396000,
-    agencyShareRate: 3.0,
-    agencyShareValue: 198000,
-    brokerId: 'usr-1',
-    brokerName: 'Rodrigo Mendonça',
-    brokerShareRate: 3.0,
-    brokerShareValue: 198000,
-    status: 'a_receber',
-    dealDate: '2026-04-20'
-  }
-];
-
-export const INITIAL_FINANCIAL: FinancialTransaction[] = [
-  {
-    id: 'fin-1',
-    description: 'Comissão Venda Casa Alphaville (MD-3091)',
-    category: 'comissao_venda',
-    type: 'receita',
-    amount: 135000,
-    date: '2026-04-05',
-    dueDate: '2026-04-05',
-    status: 'pago',
-    paymentMethod: 'ted'
-  },
-  {
-    id: 'fin-2',
-    description: 'Taxa Administração de Locações (Lote Abril)',
-    category: 'taxa_locacao',
-    type: 'receita',
-    amount: 2500,
-    date: '2026-04-10',
-    dueDate: '2026-04-10',
-    status: 'pago',
-    paymentMethod: 'pix'
-  },
-  {
-    id: 'fin-3',
-    description: 'Campanha Tráfego Pago Meta Ads (Instagram Lead Ads)',
-    category: 'marketing',
-    type: 'despesa',
-    amount: 3200,
-    date: '2026-04-12',
-    dueDate: '2026-04-12',
-    status: 'pago',
-    paymentMethod: 'cartao'
-  },
-  {
-    id: 'fin-4',
-    description: 'Assinatura Portal ZAP Imóveis + VivaReal Destaques',
-    category: 'portais',
-    type: 'despesa',
-    amount: 1850,
-    date: '2026-04-15',
-    dueDate: '2026-04-15',
-    status: 'pago',
-    paymentMethod: 'boleto'
-  },
-  {
-    id: 'fin-5',
-    description: 'Manutenção e Operação Base Pinheiro 264 - Arvoredo Contagem',
-    category: 'sede_operacional',
-    type: 'despesa',
-    amount: 1250,
-    date: '2026-04-20',
-    dueDate: '2026-04-20',
-    status: 'pago',
-    paymentMethod: 'pix'
-  },
-  {
-    id: 'fin-6',
-    description: 'Previsão Comissão Venda Itaim Bibi (MD-2910)',
-    category: 'comissao_venda',
-    type: 'receita',
-    amount: 93000,
-    date: '2026-04-28',
-    dueDate: '2026-04-28',
-    status: 'pendente',
-    paymentMethod: 'ted'
-  }
-];
-
-export const INITIAL_MARKETING: MarketingCampaign[] = [
-  {
-    id: 'mkt-1',
-    name: 'Lançamento Morada Digital - Imóveis com Luz Natural & Wellness',
-    channel: 'meta_ads',
-    budget: 4500,
-    spent: 3100,
-    leadsGenerated: 142,
-    cpl: 21.83,
-    roas: 12.4,
-    status: 'ativa',
-    headline: 'Descubra a paz de viver em um lar projetado para o seu bem-estar.'
-  },
-  {
-    id: 'mkt-2',
-    name: 'Google Ads - Pesquisa Fundo de Funil: Coberturas nos Jardins & Moema',
-    channel: 'google_ads',
-    budget: 3800,
-    spent: 2750,
-    leadsGenerated: 68,
-    cpl: 40.44,
-    roas: 18.2,
-    status: 'ativa',
-    headline: 'Imóveis exclusivos de alto padrão com atendimento 100% digital e seguro.'
-  },
-  {
-    id: 'mkt-3',
-    name: 'Destaque Super Premium - Portal ZAP & VivaReal',
-    channel: 'portal_zap',
-    budget: 2200,
-    spent: 1850,
-    leadsGenerated: 94,
-    cpl: 19.68,
-    roas: 9.8,
-    status: 'ativa',
-    headline: 'Exclusividades Morada Digital no topo das buscas dos maiores portais.'
-  },
-  {
-    id: 'mkt-4',
-    name: 'Disparo WhatsApp Oficial (31) 98427-9865 - Base VIP Compradores',
-    channel: 'whatsapp',
-    budget: 600,
-    spent: 420,
-    leadsGenerated: 31,
-    cpl: 13.54,
-    roas: 24.0,
-    status: 'ativa',
-    headline: 'Oportunidades em primeira mão antes de irem a mercado público.'
-  }
-];
 

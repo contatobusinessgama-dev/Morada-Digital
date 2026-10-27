@@ -19,10 +19,12 @@ import {
   CheckCircle,
   XCircle,
   ShieldAlert,
-  Sparkles
+  Sparkles,
+  Trash2
 } from 'lucide-react';
 import { useRealEstate } from '../../context/RealEstateContext';
 import { Lead, LeadStage, LeadOrigin } from '../../types';
+import { LeadCaptureAIAssistant } from './LeadCaptureAIAssistant';
 
 const STAGES: { id: LeadStage; title: string; color: string; badgeColor: string; bgHeader: string }[] = [
   { id: 'novo', title: 'Novo Lead', color: 'border-blue-500', badgeColor: 'bg-blue-100 text-blue-900', bgHeader: 'bg-blue-50/80' },
@@ -34,12 +36,14 @@ const STAGES: { id: LeadStage; title: string; color: string; badgeColor: string;
 ];
 
 export const LeadsKanban: React.FC = () => {
-  const { leads, moveLeadStage, setSelectedLead, team, addLead, currentUser, showToast } = useRealEstate();
+  const { leads, moveLeadStage, setSelectedLead, team, addLead, deleteLead, currentUser, showToast } = useRealEstate();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBrokerFilter, setSelectedBrokerFilter] = useState('todos');
   const [selectedOriginFilter, setSelectedOriginFilter] = useState('todos');
   const [isNewLeadModalOpen, setIsNewLeadModalOpen] = useState(false);
+  const [isAIAssistantModalOpen, setIsAIAssistantModalOpen] = useState(false);
+  const [leadToDelete, setLeadToDelete] = useState<Lead | null>(null);
 
   // New Lead Form state
   const [newLeadName, setNewLeadName] = useState('');
@@ -193,11 +197,16 @@ export const LeadsKanban: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center text-xs text-slate-600 gap-1.5 bg-amber-50/80 border border-amber-200/60 px-3 py-1.5 rounded-xl font-medium">
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            <span>Distribuição Round-Robin Ativa</span>
-          </div>
+        <div className="flex items-center gap-2">
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => setIsAIAssistantModalOpen(true)}
+            className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 px-3.5 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow-md transition-all cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4 text-slate-950" />
+            <span>Captação IA</span>
+          </motion.button>
 
           <motion.button
             whileHover={{ scale: 1.03 }}
@@ -330,12 +339,24 @@ export const LeadsKanban: React.FC = () => {
                           {lead.stage !== 'fechado_ganho' && lead.stage !== 'perdido' && (
                             <button
                               onClick={(e) => moveNext(lead, e)}
-                              className="p-1 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-amber-600"
+                              className="p-1 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-amber-600 cursor-pointer"
                               title="Avançar etapa no funil"
                             >
                               <ArrowRight className="w-3 h-3" />
                             </button>
                           )}
+
+                          {/* Director / Admin Delete Lead Button */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setLeadToDelete(lead);
+                            }}
+                            className="p-1 hover:bg-rose-50 rounded-lg text-slate-300 hover:text-rose-600 transition-colors cursor-pointer"
+                            title="Excluir Lead (Diretor / ADM)"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
                         </div>
                       </div>
                     </motion.div>
@@ -459,6 +480,80 @@ export const LeadsKanban: React.FC = () => {
           </motion.div>
         </div>
       )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: ASSISTENTE DE IA PARA CAPTAÇÃO DE CLIENTES & PROPRIETÁRIOS        */}
+      {/* ========================================================================= */}
+      {isAIAssistantModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl border border-slate-200">
+            <div className="flex justify-between items-center pb-4 border-b border-slate-100 mb-6">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-bold">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-base">Assistente de IA para Captação Total</h3>
+                  <p className="text-xs text-slate-500">Qualificação BANT, abordagem de proprietários e conversão de mensagens</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsAIAssistantModalOpen(false)}
+                className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold flex items-center justify-center cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <LeadCaptureAIAssistant />
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL: CONFIRMAÇÃO DE EXCLUSÃO DE LEAD                                   */}
+      {/* ========================================================================= */}
+      {leadToDelete && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4 text-xs">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto">
+              <Trash2 className="w-6 h-6" />
+            </div>
+
+            <div className="text-center space-y-1">
+              <h3 className="font-bold text-base text-slate-900">Excluir Lead do Funil?</h3>
+              <p className="text-slate-500">
+                Deseja excluir permanentemente o lead <strong>{leadToDelete.name}</strong> ({leadToDelete.phone})?
+              </p>
+            </div>
+
+            <div className="bg-rose-50 p-3 rounded-xl border border-rose-100 text-rose-800 text-[11px]">
+              O lead será removido da coluna do CRM e do histórico do corretor responsável.
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setLeadToDelete(null)}
+                className="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  deleteLead(leadToDelete.id);
+                  setLeadToDelete(null);
+                }}
+                className="w-1/2 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl shadow-md cursor-pointer"
+              >
+                Sim, Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

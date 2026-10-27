@@ -139,6 +139,70 @@ export interface Proposal {
 
 export type UserRole = 'admin' | 'gerente' | 'corretor' | 'proprietario' | 'cliente';
 
+export interface UserPermissions {
+  // Imóveis & Inventário
+  canCreateProperties: boolean;
+  canEditProperties: boolean;
+  canDeleteProperties: boolean;
+  // Comercial / Leads / Vendas
+  canViewAllLeads: boolean;
+  canManageProposals: boolean;
+  canManageContracts: boolean;
+  canScheduleVisits: boolean;
+  // Financeiro & Comissões
+  canViewAgencyFinancial: boolean;
+  canApproveCommissions: boolean;
+  // Gestão & Sistema
+  canManageBrokers: boolean;
+  canManageUsersAndRoles: boolean;
+  canManageSettings: boolean;
+}
+
+export const DEFAULT_ADMIN_PERMISSIONS: UserPermissions = {
+  canCreateProperties: true,
+  canEditProperties: true,
+  canDeleteProperties: true,
+  canViewAllLeads: true,
+  canManageProposals: true,
+  canManageContracts: true,
+  canScheduleVisits: true,
+  canViewAgencyFinancial: true,
+  canApproveCommissions: true,
+  canManageBrokers: true,
+  canManageUsersAndRoles: true,
+  canManageSettings: true
+};
+
+export const DEFAULT_GERENTE_PERMISSIONS: UserPermissions = {
+  canCreateProperties: true,
+  canEditProperties: true,
+  canDeleteProperties: false,
+  canViewAllLeads: true,
+  canManageProposals: true,
+  canManageContracts: true,
+  canScheduleVisits: true,
+  canViewAgencyFinancial: true,
+  canApproveCommissions: false,
+  canManageBrokers: true,
+  canManageUsersAndRoles: false,
+  canManageSettings: false
+};
+
+export const DEFAULT_CORRETOR_PERMISSIONS: UserPermissions = {
+  canCreateProperties: true,
+  canEditProperties: true,
+  canDeleteProperties: false,
+  canViewAllLeads: false,
+  canManageProposals: true,
+  canManageContracts: false,
+  canScheduleVisits: true,
+  canViewAgencyFinancial: false,
+  canApproveCommissions: false,
+  canManageBrokers: false,
+  canManageUsersAndRoles: false,
+  canManageSettings: false
+};
+
 export interface User {
   id: string;
   name: string;
@@ -150,6 +214,22 @@ export interface User {
   activeLeadsCount?: number;
   salesMonthVGV?: number;
   salesGoal?: number;
+  // Broker specific management fields
+  cpf?: string;
+  pixKey?: string;
+  pixKeyType?: 'cpf' | 'cnpj' | 'email' | 'telefone' | 'aleatoria';
+  commissionRate?: number; // e.g. 45 (%)
+  rentalCommissionRate?: number; // e.g. 50 (%)
+  status?: 'ativo' | 'ferias' | 'inativo';
+  joinedDate?: string;
+  specialties?: string[];
+  totalSalesVGV?: number;
+  paidCommissions?: number;
+  pendingCommissions?: number;
+  bio?: string;
+  city?: string;
+  // Granular Access Control & Permissions
+  permissions?: UserPermissions;
 }
 
 export type SidebarModule = 
@@ -157,6 +237,7 @@ export type SidebarModule =
   | 'dashboard'
   | 'imoveis'
   | 'clientes'
+  | 'corretores'
   // Comercial
   | 'leads'
   | 'agenda'
@@ -169,6 +250,8 @@ export type SidebarModule =
   | 'financeiro'
   // Sistema
   | 'marketing'
+  | 'proptech_tools'
+  | 'treinamento'
   | 'configuracoes';
 
 export interface Cliente {
@@ -310,12 +393,31 @@ export interface FinancialTransaction {
   dueDate: string;
   status: 'pago' | 'pendente' | 'agendado';
   paymentMethod: 'pix' | 'ted' | 'boleto' | 'cartao';
+  documentNumber?: string;
+  notes?: string;
+  payerOrPayee?: string;
+}
+
+export interface AgencyFinancialSettings {
+  defaultSalesCommissionRate: number; // e.g. 6.0 (%)
+  agencySplitPercent: number; // e.g. 55 (%)
+  brokerSplitPercent: number; // e.g. 45 (%)
+  defaultRentalAdminFeePercent: number; // e.g. 8.0 (%)
+  bankName: string;
+  bankCode: string;
+  agencyNumber: string;
+  accountNumber: string;
+  accountHolder: string;
+  cnpj: string;
+  pixKey: string;
+  pixKeyType: 'cnpj' | 'email' | 'telefone' | 'aleatoria';
+  escrowAccountNotes: string;
 }
 
 export interface MarketingCampaign {
   id: string;
   name: string;
-  channel: 'meta_ads' | 'google_ads' | 'portal_zap' | 'portal_vivareal' | 'whatsapp';
+  channel: 'meta_ads' | 'google_ads' | 'portal_zap' | 'portal_vivareal' | 'whatsapp' | 'instagram' | 'tiktok' | 'youtube' | 'facebook';
   budget: number;
   spent: number;
   leadsGenerated: number;
@@ -323,6 +425,41 @@ export interface MarketingCampaign {
   roas: number; // Retorno
   status: 'ativa' | 'pausada' | 'concluida';
   headline: string;
+  targetAudience?: string;
+  linkUrl?: string;
+  startDate?: string;
+  endDate?: string;
+  notes?: string;
+}
+
+export interface SocialMediaConfig {
+  instagramUrl: string;
+  facebookUrl: string;
+  youtubeUrl: string;
+  tiktokUrl: string;
+  linkedinUrl: string;
+  whatsappBusinessNumber: string;
+  whatsappDirectLink: string;
+  bioSlogan: string;
+  metaPixelId: string;
+  googleAnalyticsId: string;
+  googleTagManagerId: string;
+}
+
+export interface DashboardConfig {
+  layoutDensity: 'compacto' | 'padrao' | 'expandido';
+  monthlyTargetVGV: number;
+  monthlyPropertiesTarget: number;
+  widgets: {
+    kpis: boolean;
+    chartPropertiesVolume: boolean;
+    chartOpenSales: boolean;
+    chartBrokerPerformance: boolean;
+    chartPortfolioDistribution: boolean;
+    criticalDeals: boolean;
+    quickActions: boolean;
+    conversionTargetBanner: boolean;
+  };
 }
 
 export interface SearchFilterState {

@@ -12,18 +12,23 @@ import {
   FileText, 
   User, 
   ArrowUpRight,
-  ShieldCheck
+  ShieldCheck,
+  Edit3,
+  Trash2
 } from 'lucide-react';
 import { useRealEstate } from '../../context/RealEstateContext';
 import { Locacao } from '../../types';
 import { MORADA_BRAND } from '../../data/mockDatabase';
 
 export const RentalsManager: React.FC = () => {
-  const { locacoes, updateLocacaoStatus, showToast } = useRealEstate();
+  const { locacoes, updateLocacaoStatus, updateLocacao, deleteLocacao, showToast } = useRealEstate();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('todos');
   const [selectedReceipt, setSelectedReceipt] = useState<Locacao | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingLocacao, setEditingLocacao] = useState<Locacao | null>(null);
+  const [locacaoToDelete, setLocacaoToDelete] = useState<Locacao | null>(null);
 
   const filteredLocacoes = locacoes.filter(loc => {
     const matchesStatus = filterStatus === 'todos' || loc.currentMonthStatus === filterStatus;
@@ -244,6 +249,18 @@ export const RentalsManager: React.FC = () => {
                         </button>
                       )}
 
+                      {/* Edit Rental Financial Data */}
+                      <button
+                        onClick={() => {
+                          setEditingLocacao({ ...loc });
+                          setIsEditModalOpen(true);
+                        }}
+                        className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+                        title="Editar valores financeiros da locação"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+
                       {/* Receipt Modal Trigger */}
                       <button
                         onClick={() => setSelectedReceipt(loc)}
@@ -251,6 +268,15 @@ export const RentalsManager: React.FC = () => {
                         title="Emitir Recibo / Extrato de Repasse"
                       >
                         <FileText className="w-4 h-4" />
+                      </button>
+
+                      {/* Delete Rental Button */}
+                      <button
+                        onClick={() => setLocacaoToDelete(loc)}
+                        className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                        title="Excluir Contrato de Locação (Diretor / ADM)"
+                      >
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
@@ -338,6 +364,181 @@ export const RentalsManager: React.FC = () => {
               </a>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: EDITAR VALORES FINANCEIROS DA LOCAÇÃO */}
+      {isEditModalOpen && editingLocacao && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+              <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
+                <Edit3 className="w-4 h-4 text-indigo-600" />
+                <span>Editar Valores da Locação ({editingLocacao.code})</span>
+              </h3>
+              <button onClick={() => setIsEditModalOpen(false)} className="text-slate-400 hover:text-slate-700 font-bold">✕</button>
+            </div>
+
+            <form onSubmit={e => {
+              e.preventDefault();
+              const rent = Number(editingLocacao.monthlyRent);
+              const feePct = Number(editingLocacao.adminFeePercent);
+              const adminVal = Math.round(rent * (feePct / 100));
+              const netTransfer = rent - adminVal;
+
+              updateLocacao(editingLocacao.id, {
+                ...editingLocacao,
+                adminFeeValue: adminVal,
+                ownerNetTransfer: netTransfer
+              });
+              setIsEditModalOpen(false);
+            }} className="space-y-4 text-xs">
+              
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Aluguel Mensal (R$)</label>
+                  <input
+                    type="number"
+                    required
+                    value={editingLocacao.monthlyRent}
+                    onChange={e => setEditingLocacao({ ...editingLocacao, monthlyRent: Number(e.target.value) })}
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-800 font-bold"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Taxa Admin (%)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={editingLocacao.adminFeePercent}
+                    onChange={e => setEditingLocacao({ ...editingLocacao, adminFeePercent: Number(e.target.value) })}
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-800 font-bold text-indigo-700"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Dia Vencimento</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={31}
+                    value={editingLocacao.paymentDueDay}
+                    onChange={e => setEditingLocacao({ ...editingLocacao, paymentDueDay: Number(e.target.value) })}
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-800"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Condomínio Estimado (R$)</label>
+                  <input
+                    type="number"
+                    value={editingLocacao.condoFee}
+                    onChange={e => setEditingLocacao({ ...editingLocacao, condoFee: Number(e.target.value) })}
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-800"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">IPTU Mensal (R$)</label>
+                  <input
+                    type="number"
+                    value={editingLocacao.iptuMonthly}
+                    onChange={e => setEditingLocacao({ ...editingLocacao, iptuMonthly: Number(e.target.value) })}
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-800"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Inquilino(a)</label>
+                  <input
+                    type="text"
+                    value={editingLocacao.tenantName}
+                    onChange={e => setEditingLocacao({ ...editingLocacao, tenantName: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-800"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Proprietário(a)</label>
+                  <input
+                    type="text"
+                    value={editingLocacao.ownerName}
+                    onChange={e => setEditingLocacao({ ...editingLocacao, ownerName: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-800"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Modalidade de Garantia</label>
+                <input
+                  type="text"
+                  value={editingLocacao.warranty}
+                  onChange={e => setEditingLocacao({ ...editingLocacao, warranty: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-slate-800"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="px-4 py-2 font-bold text-slate-600 hover:bg-slate-100 rounded-xl"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 font-bold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md"
+                >
+                  Salvar Valores da Locação
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Rental Confirmation Modal */}
+      {locacaoToDelete && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 space-y-4 text-xs">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto">
+              <Trash2 className="w-6 h-6" />
+            </div>
+
+            <div className="text-center space-y-1">
+              <h3 className="font-bold text-base text-slate-900">Excluir Contrato de Locação?</h3>
+              <p className="text-slate-500">
+                Deseja excluir a locação <strong>{locacaoToDelete.code}</strong> do imóvel <strong>{locacaoToDelete.propertyTitle}</strong> (Inquilino: {locacaoToDelete.tenantName})?
+              </p>
+            </div>
+
+            <div className="bg-rose-50 p-3 rounded-xl border border-rose-100 text-rose-800 text-[11.5px]">
+              O histórico financeiro de repasses e taxa de administração deste imóvel será removido da listagem ativa.
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setLocacaoToDelete(null)}
+                className="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  deleteLocacao(locacaoToDelete.id);
+                  setLocacaoToDelete(null);
+                }}
+                className="w-1/2 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl shadow-md cursor-pointer"
+              >
+                Sim, Excluir
+              </button>
+            </div>
           </div>
         </div>
       )}

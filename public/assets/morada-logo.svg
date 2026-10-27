@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 360" width="100%" height="100%">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&amp;family=Montserrat:wght@500;600;700&amp;display=swap');
+      .cls-navy { fill: #0B2545; }
+      .cls-gold { stroke: #C59B27; fill: none; }
+      .cls-gold-fill { fill: #C59B27; fill-opacity: 0.25; }
+      .cls-teal { fill: #16655E; }
+      .cls-teal-stroke { stroke: #16655E; stroke-width: 2.5; stroke-linecap: round; }
+      .text-morada { font-family: 'Cinzel', 'Times New Roman', serif; font-size: 58px; font-weight: 700; fill: #0B2545; letter-spacing: 12px; }
+      .text-digital { font-family: 'Montserrat', sans-serif; font-size: 26px; font-weight: 700; fill: #16655E; letter-spacing: 12px; }
+      .text-tagline { font-family: 'Montserrat', sans-serif; font-size: 14.5px; font-weight: 600; fill: #0B2545; letter-spacing: 6.5px; }
+    </style>
+  </defs>
+
+  <g transform="translate(190, 20)">
+    <!-- Architectural Roof Peak -->
+    <path d="M 30 70 L 110 20 L 190 70 L 176 82 L 110 40 L 44 82 Z" class="cls-navy" />
+
+    <!-- Letter M Monogram -->
+    <path d="M 22 135 L 50 135 L 50 128 L 42 128 L 42 80 L 29 80 L 29 128 L 22 128 Z" class="cls-navy" />
+    <path d="M 42 80 L 80 126 L 94 112 L 62 70 Z" class="cls-navy" />
+
+    <!-- Golden Arched Window -->
+    <path d="M 94 92 C 94 82 101 74 110 74 C 119 74 126 82 126 92 L 126 128 L 94 128 Z" class="cls-gold" stroke-width="4" />
+    <line x1="110" y1="75" x2="110" y2="128" stroke="#C59B27" stroke-width="3" />
+    <line x1="95" y1="100" x2="125" y2="100" stroke="#C59B27" stroke-width="3" />
+    <path d="M 96 92 C 96 84 102 77 108 76 L 108 98 L 96 98 Z" class="cls-gold-fill" />
+    <path d="M 124 92 C 124 84 118 77 112 76 L 112 98 L 124 98 Z" class="cls-gold-fill" />
+    <rect x="96.5" y="102" width="11.5" height="24" class="cls-gold-fill" />
+    <rect x="112" y="102" width="11.5" height="24" class="cls-gold-fill" />
+
+    <!-- Letter D Monogram -->
+    <path d="M 148 68 L 148 135 L 168 135 C 190 135 204 121 204 101 C 204 81 190 68 168 68 Z M 162 82 C 178 82 186 91 186 101 C 186 111 178 121 162 121 L 162 82 Z" class="cls-navy" />
+  </g>
+
+  <!-- Typography -->
+  <text x="300" y="225" text-anchor="middle" class="text-morada">MORADA</text>
+
+  <!-- Flanked DIGITAL -->
+  <line x1="120" y1="262" x2="190" y2="262" class="cls-teal-stroke" />
+  <text x="300" y="271" text-anchor="middle" class="text-digital">DIGITAL</text>
+  <line x1="410" y1="262" x2="480" y2="262" class="cls-teal-stroke" />
+
+  <!-- Tagline -->
+  <text x="300" y="312" text-anchor="middle" class="text-tagline">SUA IMOBILIÁRIA INTELIGENTE</text>
+</svg>

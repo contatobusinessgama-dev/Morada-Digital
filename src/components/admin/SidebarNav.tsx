@@ -16,11 +16,15 @@ import {
   MapPin,
   Phone,
   Sparkles,
-  Globe
+  UserCheck,
+  GraduationCap,
+  Globe,
+  Calculator
 } from 'lucide-react';
 import { useRealEstate } from '../../context/RealEstateContext';
 import { SidebarModule } from '../../types';
 import { MORADA_BRAND } from '../../data/mockDatabase';
+import { MoradaLogo } from '../common/MoradaLogo';
 
 interface NavItem {
   id: SidebarModule;
@@ -35,12 +39,13 @@ interface NavSection {
 }
 
 export const SidebarNav: React.FC = () => {
-  const { activeModule, setActiveModule, visitas, leads, propostas, locacoes, contratos, setCurrentView } = useRealEstate();
+  const { activeModule, setActiveModule, visitas, leads, propostas, locacoes, contratos, setCurrentView, team } = useRealEstate();
 
   // Active counts for badges
   const pendingVisitsCount = visitas.filter(v => v.status === 'agendada' || v.status === 'confirmada').length;
   const newLeadsCount = leads.filter(l => l.stage === 'novo').length;
   const activeRentalsCount = locacoes.length;
+  const activeBrokersCount = team.filter(u => u.status === 'ativo' || !u.status).length;
 
   const sections: NavSection[] = [
     {
@@ -49,6 +54,7 @@ export const SidebarNav: React.FC = () => {
         { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
         { id: 'imoveis', label: 'Imóveis', icon: Building2 },
         { id: 'clientes', label: 'Clientes', icon: Users },
+        { id: 'corretores', label: 'Corretores', icon: UserCheck, badge: activeBrokersCount },
       ]
     },
     {
@@ -73,6 +79,8 @@ export const SidebarNav: React.FC = () => {
       title: 'SISTEMA',
       items: [
         { id: 'marketing', label: 'Marketing', icon: Megaphone },
+        { id: 'proptech_tools', label: 'Calculadoras & Garantias', icon: Calculator, badge: 'Inovação' },
+        { id: 'treinamento', label: 'Treinamento & IA', icon: GraduationCap },
         { id: 'configuracoes', label: 'Configurações', icon: Settings },
       ]
     }
@@ -83,20 +91,11 @@ export const SidebarNav: React.FC = () => {
       
       {/* Brand Header */}
       <div>
-        <div className="px-5 py-5 border-b border-slate-800/80">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-teal-400 flex items-center justify-center text-white font-black text-sm shadow-md shadow-indigo-900/30">
-              MD
-            </div>
-            <div>
-              <span className="text-white font-bold tracking-tight text-base block font-serif">
-                Morada <span className="text-teal-400 font-sans text-xs uppercase tracking-wider font-extrabold">Digital</span>
-              </span>
-              <span className="text-[10px] text-slate-400 font-medium flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                100% Digital • Lançamento 2026
-              </span>
-            </div>
+        <div className="px-5 py-4 border-b border-slate-800/80">
+          <MoradaLogo variant="light" size="sm" showTagline={false} />
+          <div className="mt-2 text-[10px] text-slate-400 font-medium flex items-center gap-1.5 pl-0.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>100% Digital • Lançamento 2026</span>
           </div>
         </div>
 
@@ -173,16 +172,24 @@ export const SidebarNav: React.FC = () => {
           </span>
         </div>
 
-        <div className="flex items-center gap-2 pt-1 border-t border-slate-800/50">
-          <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-          <a
-            href={`https://wa.me/${MORADA_BRAND.phoneClean}?text=Ol%C3%A1%2C%20atendimento%20Morada%20Digital`}
-            target="_blank"
-            rel="noreferrer"
-            className="text-emerald-400 hover:text-emerald-300 font-bold transition-colors"
-          >
-            {MORADA_BRAND.phone}
-          </a>
+        <div className="pt-1 border-t border-slate-800/50 space-y-1">
+          <div className="flex items-center gap-2">
+            <Phone className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+            <a href="tel:3133573030" className="text-slate-300 hover:text-white font-bold transition-colors">
+              Fixo: (31) 3357-3030
+            </a>
+          </div>
+          <div className="flex items-center gap-2">
+            <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <a
+              href={`https://wa.me/${MORADA_BRAND.whatsappClean}?text=Ol%C3%A1%2C%20atendimento%20Morada%20Digital`}
+              target="_blank"
+              rel="noreferrer"
+              className="text-emerald-400 hover:text-emerald-300 font-bold transition-colors"
+            >
+              WhatsApp: (31) 98427-9865
+            </a>
+          </div>
         </div>
 
         <div className="text-[10px] text-slate-400 pt-1">

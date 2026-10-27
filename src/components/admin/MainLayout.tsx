@@ -4,6 +4,7 @@ import { HeaderBar } from './HeaderBar';
 import { DashboardExecutive } from './DashboardExecutive';
 import { PropertiesManager } from './PropertiesManager';
 import { ClientsManager } from './ClientsManager';
+import { BrokersManager } from './BrokersManager';
 import { LeadsKanban } from './LeadsKanban';
 import { AgendaManager } from './AgendaManager';
 import { VisitasManager } from './VisitasManager';
@@ -14,6 +15,8 @@ import { CommissionsManager } from './CommissionsManager';
 import { FinancialManager } from './FinancialManager';
 import { MarketingManager } from './MarketingManager';
 import { SettingsManager } from './SettingsManager';
+import { BrokerTrainingAcademy } from './BrokerTrainingAcademy';
+import { ProptechToolsHub } from '../common/ProptechToolsHub';
 import { LeadDetailModal } from './LeadDetailModal';
 import { AiBrokerAssistantModal } from './AiBrokerAssistantModal';
 import { useRealEstate } from '../../context/RealEstateContext';
@@ -48,6 +51,7 @@ export const MainLayout: React.FC = () => {
             {activeModule === 'dashboard' && <DashboardExecutive />}
             {activeModule === 'imoveis' && <PropertiesManager />}
             {activeModule === 'clientes' && <ClientsManager />}
+            {activeModule === 'corretores' && <BrokersManager />}
             {activeModule === 'leads' && <LeadsKanban />}
             {activeModule === 'agenda' && <AgendaManager />}
             {activeModule === 'visitas' && <VisitasManager />}
@@ -57,6 +61,8 @@ export const MainLayout: React.FC = () => {
             {activeModule === 'comissoes' && <CommissionsManager />}
             {activeModule === 'financeiro' && <FinancialManager />}
             {activeModule === 'marketing' && <MarketingManager />}
+            {activeModule === 'proptech_tools' && <ProptechToolsHub />}
+            {activeModule === 'treinamento' && <BrokerTrainingAcademy />}
             {activeModule === 'configuracoes' && <SettingsManager onReturnToSite={() => setCurrentView('public')} />}
           </div>
         </main>
