@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Search, 
   MapPin, 
@@ -7,6 +7,8 @@ import {
   Maximize2, 
   Heart, 
   Phone, 
+  PhoneCall,
+  Smartphone,
   MessageCircle, 
   ShieldCheck, 
   Sparkles, 
@@ -38,6 +40,7 @@ import { MORADA_BRAND } from '../../data/mockDatabase';
 import { MoradaLogo } from '../common/MoradaLogo';
 import { PropertyListingWizard } from './PropertyListingWizard';
 import { ProptechToolsHub, ProptechTab } from '../common/ProptechToolsHub';
+import { GeminiChatbot } from '../common/GeminiChatbot';
 
 export const PublicSite: React.FC = () => {
   const { 
@@ -49,8 +52,9 @@ export const PublicSite: React.FC = () => {
     showToast 
   } = useRealEstate();
 
-  // Mobile Menu State
+  // Mobile Menu & Modals State
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isPhonesModalOpen, setIsPhonesModalOpen] = useState(false);
 
   // Modal para Proprietário Vender/Anunciar Imóvel
   const [isListingWizardOpen, setIsListingWizardOpen] = useState(false);
@@ -77,6 +81,32 @@ export const PublicSite: React.FC = () => {
   });
   const [onlyFavorites, setOnlyFavorites] = useState(false);
   const [copiedContact, setCopiedContact] = useState<string | null>(null);
+
+  // Lock body scroll on modal/drawer open
+  useEffect(() => {
+    if (isMobileMenuOpen || isPhonesModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen, isPhonesModalOpen]);
+
+  // Handle escape key to dismiss open menus
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsMobileMenuOpen(false);
+        setIsPhonesModalOpen(false);
+        setIsCalculatorsOpen(false);
+        setIsGarantiaPopoverOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const toggleFavorite = (propertyId: string, propertyTitle: string) => {
     setFavorites(prev => {
@@ -172,18 +202,25 @@ export const PublicSite: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-16 lg:pb-0">
       
       {/* 1. TOP INSTITUTIONAL BAR & MAIN NAVBAR */}
       <header className="sticky top-0 z-40 shadow-sm">
         
-        {/* Upper Institutional Info Strip */}
-        <div className="bg-[#07172C] text-white border-b border-slate-800/80 px-4 sm:px-6 lg:px-8 py-1.5 text-[11px] font-sans">
-          <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2.5">
+        {/* Upper Institutional Info Strip - Optimized for Mobile & Desktop */}
+        <div className="bg-[#07172C] text-white border-b border-slate-800/80 px-3 sm:px-6 lg:px-8 py-1.5 text-[11px] font-sans">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
             
-            {/* Left: Sede, CRECI & Responsabilidade Técnica */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3.5 text-slate-300">
-              <span className="flex items-center gap-1.5 font-medium">
+            {/* Left: Mobile condensed badge / Desktop full CRECI & Sede */}
+            <div className="flex items-center gap-2 text-slate-300 min-w-0">
+              <span className="inline-flex items-center gap-1.5 text-emerald-300 font-semibold text-[10px] sm:text-[11px] truncate">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                <span className="sm:hidden">Plantão Contagem & BH</span>
+                <span className="hidden sm:inline">Plantão Digital Ativo</span>
+              </span>
+
+              <span className="hidden sm:inline text-slate-600">•</span>
+              <span className="hidden sm:flex items-center gap-1.5 text-slate-300 font-medium truncate">
                 <MapPin className="w-3.5 h-3.5 text-teal-400 shrink-0" />
                 <strong className="text-white">Sede:</strong> {MORADA_BRAND.address}
               </span>
@@ -193,25 +230,37 @@ export const PublicSite: React.FC = () => {
               </span>
               <span className="hidden lg:inline text-slate-600">•</span>
               <span className="hidden lg:inline text-amber-300/95 font-semibold">
-                Diretor Técnico: Daniel Gama (CRECI 68.165-F)
-              </span>
-              <span className="hidden xl:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-950/70 border border-emerald-500/30 text-emerald-300 text-[10px] font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Plantão Digital Ativo
+                Daniel Gama (CRECI 68.165-F)
               </span>
             </div>
 
-            {/* Right: Telefones com Cópia Interativa & Acesso Restrito */}
-            <div className="flex items-center gap-2.5 ml-auto">
+            {/* Right: Telefones & Celulares com Cópia Interativa e Modal de Configuração */}
+            <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 ml-auto">
               {copiedContact && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30 animate-in fade-in">
+                <span className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30 animate-in fade-in">
                   <Check className="w-3 h-3" />
-                  {copiedContact} copiado!
+                  <span className="hidden sm:inline">{copiedContact} copiado!</span>
+                  <span className="sm:hidden">Copiado!</span>
                 </span>
               )}
 
-              {/* Fixo com Cópia */}
-              <div className="flex items-center gap-1 bg-white/5 hover:bg-white/10 px-2 py-0.5 rounded-md border border-white/10 transition-colors">
+              {/* Botão Central de Telefones & Celulares */}
+              <button
+                type="button"
+                onClick={() => setIsPhonesModalOpen(true)}
+                className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-200 hover:text-white border border-indigo-400/30 text-[10px] sm:text-[10.5px] font-bold transition-all cursor-pointer"
+                title="Ver todos os celulares e telefones configurados da Morada Digital"
+              >
+                <Smartphone className="w-3 h-3 text-indigo-300" />
+                <span className="hidden sm:inline">Central Telefônica</span>
+                <span className="sm:hidden">Celulares</span>
+                <span className="bg-indigo-400/30 text-indigo-100 text-[9px] px-1 rounded-sm">
+                  {MORADA_BRAND.contactPhones.length}
+                </span>
+              </button>
+
+              {/* Fixo com Cópia (Desktop/Tablet) */}
+              <div className="hidden md:flex items-center gap-1 bg-white/5 hover:bg-white/10 px-2 py-0.5 rounded-md border border-white/10 transition-colors">
                 <a
                   href="tel:3133573030"
                   className="flex items-center gap-1.5 text-slate-200 hover:text-white font-bold transition-colors"
@@ -229,38 +278,37 @@ export const PublicSite: React.FC = () => {
                 </button>
               </div>
 
-              <span className="text-slate-700">|</span>
-
-              {/* WhatsApp com Cópia */}
-              <div className="flex items-center gap-1 bg-emerald-950/40 hover:bg-emerald-950/70 px-2 py-0.5 rounded-md border border-emerald-500/20 transition-colors">
+              {/* WhatsApp / Celular Principal */}
+              <div className="flex items-center gap-1 bg-emerald-950/40 hover:bg-emerald-950/70 px-1.5 sm:px-2 py-0.5 rounded-md border border-emerald-500/20 transition-colors">
                 <a
                   href={`https://wa.me/${MORADA_BRAND.whatsappClean}?text=Ol%C3%A1%2C%20atendimento%20Morada%20Digital`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 font-bold transition-colors"
+                  className="flex items-center gap-1 sm:gap-1.5 text-emerald-400 hover:text-emerald-300 font-bold transition-colors"
                 >
                   <MessageCircle className="w-3 h-3 text-emerald-400" />
-                  <span>WhatsApp: (31) 98427-9865</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse hidden sm:inline-block" />
+                  <span className="hidden sm:inline">WhatsApp: (31) 98427-9865</span>
+                  <span className="sm:hidden">(31) 98427-9865</span>
                 </a>
                 <button
                   onClick={() => copyToClipboard('(31) 98427-9865', 'WhatsApp')}
-                  className="text-emerald-400/80 hover:text-emerald-300 p-0.5 rounded hover:bg-white/10 cursor-pointer"
+                  className="text-emerald-400/80 hover:text-emerald-300 p-0.5 rounded hover:bg-white/10 cursor-pointer hidden sm:inline-block"
                   title="Copiar número do WhatsApp"
                 >
                   <Copy className="w-3 h-3" />
                 </button>
               </div>
 
-              <span className="text-slate-700">|</span>
+              <span className="text-slate-700 hidden sm:inline">|</span>
 
               <button
                 onClick={requestSystemAccess}
-                className="flex items-center gap-1.5 text-slate-300 hover:text-white font-semibold transition-colors cursor-pointer text-[10.5px] bg-white/10 hover:bg-white/20 px-2.5 py-0.5 rounded-md border border-white/10"
+                className="flex items-center gap-1 text-slate-300 hover:text-white font-semibold transition-colors cursor-pointer text-[10px] sm:text-[10.5px] bg-white/10 hover:bg-white/20 px-2 py-0.5 rounded-md border border-white/10"
                 title="Acesso Administrativo para Corretores e Diretoria"
               >
                 <Lock className="w-3 h-3 text-slate-300" />
-                <span>{isSystemAuthenticated ? 'Abrir CRM' : 'Área Restrita'}</span>
+                <span className="hidden sm:inline">{isSystemAuthenticated ? 'Abrir CRM' : 'Área Restrita'}</span>
+                <span className="sm:hidden">CRM</span>
               </button>
             </div>
 
@@ -539,166 +587,544 @@ export const PublicSite: React.FC = () => {
                 <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse hidden md:inline-block" />
               </a>
 
-              {/* Mobile Menu Hamburger */}
+              {/* Mobile Animated Hamburger Button */}
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-                aria-label="Abrir menu de navegação"
+                className="lg:hidden relative w-10 h-10 rounded-xl text-slate-700 hover:bg-slate-100 flex flex-col items-center justify-center gap-1 transition-all cursor-pointer focus:outline-hidden"
+                aria-label={isMobileMenuOpen ? "Fechar menu" : "Abrir menu"}
+                aria-expanded={isMobileMenuOpen}
               >
-                {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                <span className={`block w-5 h-0.5 bg-slate-800 rounded-full transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`} />
+                <span className={`block w-5 h-0.5 bg-slate-800 rounded-full transition-all duration-200 ${isMobileMenuOpen ? 'opacity-0 scale-x-0' : 'opacity-100'}`} />
+                <span className={`block w-5 h-0.5 bg-slate-800 rounded-full transition-all duration-300 ease-in-out ${isMobileMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`} />
               </button>
 
             </div>
 
           </div>
+        </div>
 
-          {/* Mobile Drawer Menu */}
-          {isMobileMenuOpen && (
-            <div className="lg:hidden border-t border-slate-200 bg-white px-4 py-4 space-y-3 animate-in slide-in-from-top-4 duration-200 text-xs">
-              
-              {/* Mobile Search Input */}
-              <div className="relative">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={locationQuery}
-                  onChange={(e) => setLocationQuery(e.target.value)}
-                  placeholder="Buscar bairro, rua ou código..."
-                  className="w-full bg-slate-100 text-xs pl-9 pr-8 py-2.5 rounded-xl border border-slate-200 focus:outline-hidden focus:border-indigo-500"
-                />
-                {locationQuery && (
-                  <button
-                    onClick={() => setLocationQuery('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 p-0.5"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
+        {/* 2. FLUID RESPONSIVE MOBILE OFF-CANVAS DRAWER & BACKDROP */}
+        {/* Backdrop Overlay */}
+        <div 
+          className={`fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 transition-opacity duration-300 lg:hidden ${
+            isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+          onClick={() => setIsMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
 
-              <div className="space-y-1">
-                <a
-                  href="#imoveis"
-                  onClick={() => { setOnlyFavorites(false); setIsMobileMenuOpen(false); }}
-                  className="block px-3 py-2 rounded-xl font-bold text-slate-800 hover:bg-slate-50"
-                >
-                  Ver Todos os Imóveis ({properties.length})
-                </a>
-
-                {/* Mobile Favoritos Toggle */}
-                <button
-                  type="button"
-                  onClick={() => { setOnlyFavorites(prev => !prev); setIsMobileMenuOpen(false); const el = document.getElementById('imoveis'); el?.scrollIntoView({ behavior: 'smooth' }); }}
-                  className="w-full text-left px-3 py-2 rounded-xl font-bold text-rose-700 bg-rose-50/60 hover:bg-rose-50 flex items-center justify-between cursor-pointer"
-                >
-                  <span className="flex items-center gap-2">
-                    <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
-                    <span>Meus Imóveis Favoritos</span>
-                  </span>
-                  <span className="text-[10px] bg-rose-500 text-white font-bold px-2 py-0.5 rounded-full">
-                    {favorites.length}
-                  </span>
-                </button>
-
-                <button
-                  onClick={() => { setGoal('venda'); setOnlyFavorites(false); setIsMobileMenuOpen(false); const el = document.getElementById('imoveis'); el?.scrollIntoView({ behavior: 'smooth' }); }}
-                  className="w-full text-left px-3 py-2 rounded-xl font-bold text-slate-800 hover:bg-slate-50 cursor-pointer"
-                >
-                  Imóveis para Venda & Lançamentos
-                </button>
-                <button
-                  onClick={() => { setGoal('locacao'); setOnlyFavorites(false); setIsMobileMenuOpen(false); const el = document.getElementById('imoveis'); el?.scrollIntoView({ behavior: 'smooth' }); }}
-                  className="w-full text-left px-3 py-2 rounded-xl font-bold text-slate-800 hover:bg-slate-50 cursor-pointer"
-                >
-                  Imóveis para Locação
-                </button>
-
-                {/* Mobile Proptech Shortcuts */}
-                <button
-                  onClick={() => { openProptech('garantia'); setIsMobileMenuOpen(false); }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 flex items-center justify-between cursor-pointer"
-                >
-                  <span className="flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                    <span>Aluguel Sem Fiador (Garantia Morada)</span>
-                  </span>
-                  <span className="text-[9px] bg-emerald-600 text-white font-extrabold px-1.5 py-0.5 rounded-md uppercase">
-                    Zero Caução
-                  </span>
-                </button>
-
-                <button
-                  onClick={() => { openProptech('comprar_ou_alugar'); setIsMobileMenuOpen(false); }}
-                  className="w-full text-left px-3 py-2 rounded-xl font-bold text-slate-800 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
-                >
-                  <Calculator className="w-4 h-4 text-indigo-600" />
-                  <span>Calculadora: Comprar ou Alugar?</span>
-                </button>
-
-                <button
-                  onClick={() => { openProptech('financiamento'); setIsMobileMenuOpen(false); }}
-                  className="w-full text-left px-3 py-2 rounded-xl font-bold text-slate-800 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
-                >
-                  <TrendingUp className="w-4 h-4 text-teal-600" />
-                  <span>Simulador Financiamento (SAC vs PRICE)</span>
-                </button>
-
-                <button
-                  onClick={() => { openProptech('reajuste'); setIsMobileMenuOpen(false); }}
-                  className="w-full text-left px-3 py-2 rounded-xl font-bold text-slate-800 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
-                >
-                  <Clock className="w-4 h-4 text-amber-600" />
-                  <span>Calculadora de Reajuste (IPCA / IGP-M)</span>
-                </button>
-
-                <button
-                  onClick={() => { openProptech('links_uteis'); setIsMobileMenuOpen(false); }}
-                  className="w-full text-left px-3 py-2 rounded-xl font-bold text-slate-800 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
-                >
-                  <FileText className="w-4 h-4 text-teal-600" />
-                  <span>Cartilha de Condomínio & Links Úteis</span>
-                </button>
-
-                <a
-                  href="#sobre"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-xl font-bold text-slate-800 hover:bg-slate-50"
-                >
-                  Nossa Sede no Bairro Arvoredo
-                </a>
-              </div>
-
-              <div className="pt-2 border-t border-slate-100 space-y-2">
-                <button
-                  onClick={() => { setIsListingWizardOpen(true); setIsMobileMenuOpen(false); }}
-                  className="w-full py-2.5 px-3 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <Building2 className="w-4 h-4 text-indigo-600" />
-                  <span>Anunciar / Vender Imóvel</span>
-                </button>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <a
-                    href="tel:3133573030"
-                    className="py-2 px-3 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 font-bold flex items-center justify-center gap-1.5"
-                  >
-                    <Phone className="w-3.5 h-3.5 text-indigo-600" />
-                    <span>(31) 3357-3030</span>
-                  </a>
-
-                  <button
-                    onClick={() => { requestSystemAccess(); setIsMobileMenuOpen(false); }}
-                    className="py-2 px-3 rounded-xl bg-slate-900 text-white font-bold flex items-center justify-center gap-1.5 cursor-pointer"
-                  >
-                    <Lock className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Acesso CRM</span>
-                  </button>
-                </div>
+        {/* Sliding Off-Canvas Sheet */}
+        <aside
+          className={`fixed top-0 right-0 w-[90%] max-w-md h-full bg-white z-50 shadow-2xl flex flex-col justify-between transform transition-transform duration-300 ease-out lg:hidden overflow-hidden ${
+            isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+          aria-label="Menu Principal de Navegação Móvel"
+        >
+          {/* Drawer Header */}
+          <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
+            <div className="flex items-center gap-2.5">
+              <MoradaLogo variant="dark" size="sm" />
+              <div className="flex flex-col">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#07172C]">
+                  Morada Digital
+                </span>
+                <span className="text-[9px] font-medium text-slate-500">
+                  Sede Bairro Arvoredo • Contagem
+                </span>
               </div>
             </div>
-          )}
-        </div>
+
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-200/70 transition-colors cursor-pointer"
+              aria-label="Fechar menu"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Drawer Scrollable Content */}
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 text-xs">
+            
+            {/* Mobile Search Bar */}
+            <div className="relative">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={locationQuery}
+                onChange={(e) => setLocationQuery(e.target.value)}
+                placeholder="Buscar bairro, rua ou código..."
+                className="w-full bg-slate-100/90 text-xs pl-9 pr-8 py-2.5 rounded-xl border border-slate-200 focus:outline-hidden focus:border-indigo-500 focus:bg-white transition-all font-medium"
+              />
+              {locationQuery && (
+                <button
+                  type="button"
+                  onClick={() => setLocationQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
+                  title="Limpar busca"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            {/* Configuração de Números de Celulares & Telefones em Destaque no Celular */}
+            <div className="bg-gradient-to-br from-indigo-950 via-slate-900 to-[#07172C] text-white p-3.5 rounded-2xl shadow-sm border border-slate-800 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-indigo-300 flex items-center gap-1.5 uppercase tracking-wider">
+                  <Smartphone className="w-3.5 h-3.5 text-indigo-400" />
+                  Celulares & Plantão
+                </span>
+                <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-bold px-1.5 py-0.5 rounded-md border border-emerald-500/30">
+                  Online Agora
+                </span>
+              </div>
+
+              {/* Cards de telefones configurados */}
+              <div className="space-y-2">
+                {MORADA_BRAND.contactPhones.map(cp => (
+                  <div 
+                    key={cp.id}
+                    className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors flex flex-col gap-1.5"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-[11px] text-white flex items-center gap-1.5">
+                        {cp.isWhatsapp ? (
+                          <MessageCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        ) : (
+                          <Phone className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                        )}
+                        <span>{cp.label}</span>
+                      </span>
+                      <span className="text-[9px] font-semibold text-slate-400">
+                        {cp.badge}
+                      </span>
+                    </div>
+
+                    <div className="text-[10px] text-slate-300 flex items-center justify-between">
+                      <span className="font-mono font-bold text-slate-100">{cp.number}</span>
+                      <span className="text-[9px] text-slate-400">{cp.status}</span>
+                    </div>
+
+                    {/* Quick Call, WhatsApp and Copy Buttons for Mobile */}
+                    <div className="grid grid-cols-3 gap-1.5 pt-1 border-t border-white/5">
+                      {cp.isWhatsapp ? (
+                        <a
+                          href={`https://wa.me/${cp.clean}?text=${encodeURIComponent(`Olá, gostaria de atendimento na Morada Digital (${cp.department})`)}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="py-1 px-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold text-[10px] flex items-center justify-center gap-1 transition-colors"
+                        >
+                          <MessageCircle className="w-3 h-3" />
+                          <span>WhatsApp</span>
+                        </a>
+                      ) : (
+                        <a
+                          href={`tel:${cp.clean}`}
+                          className="py-1 px-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold text-[10px] flex items-center justify-center gap-1 transition-colors"
+                        >
+                          <PhoneCall className="w-3 h-3" />
+                          <span>Ligar</span>
+                        </a>
+                      )}
+
+                      <a
+                        href={`tel:${cp.clean}`}
+                        className="py-1 px-1.5 bg-white/10 hover:bg-white/20 text-slate-200 rounded-lg font-bold text-[10px] flex items-center justify-center gap-1 transition-colors"
+                        title="Ligar para este número"
+                      >
+                        <Phone className="w-3 h-3 text-slate-300" />
+                        <span>Ligar</span>
+                      </a>
+
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard(cp.number, cp.label)}
+                        className="py-1 px-1.5 bg-white/10 hover:bg-white/20 text-slate-200 rounded-lg font-bold text-[10px] flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                        title="Copiar número"
+                      >
+                        <Copy className="w-3 h-3 text-slate-300" />
+                        <span>Copiar</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Categorias & Navegação Primária */}
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3">
+                Imóveis & Navegação
+              </span>
+
+              {/* Meus Favoritos Toggle */}
+              <button
+                type="button"
+                onClick={() => { setOnlyFavorites(prev => !prev); setIsMobileMenuOpen(false); const el = document.getElementById('imoveis'); el?.scrollIntoView({ behavior: 'smooth' }); }}
+                className="w-full text-left px-3 py-2.5 rounded-xl font-bold text-rose-700 bg-rose-50/70 hover:bg-rose-100/70 flex items-center justify-between cursor-pointer transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
+                  <span>Meus Imóveis Favoritos</span>
+                </span>
+                <span className="text-[10px] bg-rose-500 text-white font-bold px-2 py-0.5 rounded-full">
+                  {favorites.length}
+                </span>
+              </button>
+
+              <a
+                href="#imoveis"
+                onClick={() => { setOnlyFavorites(false); setIsMobileMenuOpen(false); }}
+                className="w-full text-left px-3 py-2.5 rounded-xl font-bold text-slate-800 hover:bg-slate-100 flex items-center justify-between transition-colors block"
+              >
+                <span>Ver Todos os Imóveis</span>
+                <span className="text-[10px] bg-slate-200 text-slate-700 font-mono px-2 py-0.5 rounded-full">
+                  {properties.length}
+                </span>
+              </a>
+
+              <button
+                type="button"
+                onClick={() => { setGoal('venda'); setOnlyFavorites(false); setIsMobileMenuOpen(false); const el = document.getElementById('imoveis'); el?.scrollIntoView({ behavior: 'smooth' }); }}
+                className={`w-full text-left px-3 py-2.5 rounded-xl font-bold transition-colors cursor-pointer ${
+                  goal === 'venda' && !onlyFavorites ? 'bg-indigo-50 text-indigo-700' : 'text-slate-800 hover:bg-slate-100'
+                }`}
+              >
+                Imóveis para Venda & Lançamentos
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setGoal('locacao'); setOnlyFavorites(false); setIsMobileMenuOpen(false); const el = document.getElementById('imoveis'); el?.scrollIntoView({ behavior: 'smooth' }); }}
+                className={`w-full text-left px-3 py-2.5 rounded-xl font-bold transition-colors cursor-pointer ${
+                  goal === 'locacao' && !onlyFavorites ? 'bg-indigo-50 text-indigo-700' : 'text-slate-800 hover:bg-slate-100'
+                }`}
+              >
+                Imóveis para Locação
+              </button>
+
+              {/* Aluguel Sem Fiador Destaque */}
+              <button
+                type="button"
+                onClick={() => { openProptech('garantia'); setIsMobileMenuOpen(false); }}
+                className="w-full text-left px-3 py-2.5 rounded-xl font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 flex items-center justify-between cursor-pointer"
+              >
+                <span className="flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  <span>Aluguel Sem Fiador (Garantia)</span>
+                </span>
+                <span className="text-[9px] bg-emerald-600 text-white font-extrabold px-1.5 py-0.5 rounded-md uppercase">
+                  Zero Caução
+                </span>
+              </button>
+            </div>
+
+            {/* Calculadoras & Simuladores */}
+            <div className="space-y-1 pt-2 border-t border-slate-100">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3">
+                Simuladores & Links Úteis
+              </span>
+
+              <button
+                type="button"
+                onClick={() => { openProptech('comprar_ou_alugar'); setIsMobileMenuOpen(false); }}
+                className="w-full text-left px-3 py-2 rounded-xl font-bold text-slate-800 hover:bg-slate-100 flex items-center gap-2 cursor-pointer"
+              >
+                <Calculator className="w-4 h-4 text-indigo-600" />
+                <span>Calculadora: Comprar ou Alugar?</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { openProptech('financiamento'); setIsMobileMenuOpen(false); }}
+                className="w-full text-left px-3 py-2 rounded-xl font-bold text-slate-800 hover:bg-slate-100 flex items-center gap-2 cursor-pointer"
+              >
+                <TrendingUp className="w-4 h-4 text-teal-600" />
+                <span>Simulador Financiamento (SAC vs PRICE)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { openProptech('reajuste'); setIsMobileMenuOpen(false); }}
+                className="w-full text-left px-3 py-2 rounded-xl font-bold text-slate-800 hover:bg-slate-100 flex items-center gap-2 cursor-pointer"
+              >
+                <Clock className="w-4 h-4 text-amber-600" />
+                <span>Calculadora de Reajuste (IPCA / IGP-M)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { openProptech('links_uteis'); setIsMobileMenuOpen(false); }}
+                className="w-full text-left px-3 py-2 rounded-xl font-bold text-slate-800 hover:bg-slate-100 flex items-center gap-2 cursor-pointer"
+              >
+                <FileText className="w-4 h-4 text-teal-600" />
+                <span>Cartilha de Condomínio & Links Úteis</span>
+              </button>
+
+              <a
+                href="#sobre"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block px-3 py-2 rounded-xl font-bold text-slate-800 hover:bg-slate-100"
+              >
+                Nossa Sede no Bairro Arvoredo
+              </a>
+            </div>
+
+            {/* Informações Institucionais & Responsabilidade Técnica */}
+            <div className="p-3 bg-slate-50 rounded-xl text-[10px] text-slate-500 space-y-1">
+              <div className="font-bold text-slate-700">Morada Digital Intermediação Imobiliária</div>
+              <div>{MORADA_BRAND.address}</div>
+              <div className="text-indigo-600 font-semibold">{MORADA_BRAND.creci}</div>
+              <div className="text-amber-700 font-semibold">Diretor Técnico: Daniel Gama (CRECI 68.165-F)</div>
+            </div>
+
+          </div>
+
+          {/* Drawer Sticky Footer with Anunciar Imóvel & CRM Access */}
+          <div className="p-4 border-t border-slate-100 bg-white space-y-2">
+            <button
+              type="button"
+              onClick={() => { setIsListingWizardOpen(true); setIsMobileMenuOpen(false); }}
+              className="w-full py-2.5 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-indigo-600/20 transition-colors"
+            >
+              <Building2 className="w-4 h-4 text-white" />
+              <span>Anunciar / Vender Imóvel</span>
+            </button>
+
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => { setIsPhonesModalOpen(true); setIsMobileMenuOpen(false); }}
+                className="py-2 px-3 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 font-bold flex items-center justify-center gap-1.5 cursor-pointer hover:bg-slate-200 transition-colors"
+              >
+                <Smartphone className="w-3.5 h-3.5 text-indigo-600" />
+                <span>Telefones</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { requestSystemAccess(); setIsMobileMenuOpen(false); }}
+                className="py-2 px-3 rounded-xl bg-slate-900 text-white font-bold flex items-center justify-center gap-1.5 cursor-pointer hover:bg-slate-800 transition-colors"
+              >
+                <Lock className="w-3.5 h-3.5 text-slate-300" />
+                <span>Área Restrita</span>
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        {/* 3. MODAL: CENTRAL DE TELEFONES & CELULARES CONFIGURADOS */}
+        {isPhonesModalOpen && (
+          <div 
+            className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200"
+            onClick={() => setIsPhonesModalOpen(false)}
+          >
+            <div 
+              className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto space-y-5 animate-in zoom-in-95 duration-200"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                    <Smartphone className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-slate-900 text-base">Central Telefônica & Celulares</h3>
+                    <p className="text-xs text-slate-500">Contatos diretos e canais oficiais da Morada Digital</p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsPhonesModalOpen(false)}
+                  className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Informações da Sede */}
+              <div className="p-3 bg-slate-50 rounded-2xl text-xs space-y-1 border border-slate-200/70">
+                <div className="font-bold text-slate-800 flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-teal-600" />
+                  <span>Sede Operacional: {MORADA_BRAND.address}</span>
+                </div>
+                <div className="text-slate-600 text-[11px] pl-5">
+                  Responsabilidade Técnica: <strong className="text-slate-800">Daniel Gama (CRECI 68.165-F)</strong> • {MORADA_BRAND.creci}
+                </div>
+              </div>
+
+              {/* Lista dos Números Configuradas */}
+              <div className="space-y-3">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+                  Linhas Diretas Disponíveis ({MORADA_BRAND.contactPhones.length})
+                </span>
+
+                {MORADA_BRAND.contactPhones.map(phone => (
+                  <div
+                    key={phone.id}
+                    className="p-4 rounded-2xl border border-slate-200 bg-white hover:border-indigo-300 hover:shadow-md transition-all space-y-2.5"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-slate-900 text-sm">{phone.label}</span>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                            {phone.badge}
+                          </span>
+                        </div>
+                        <span className="text-xs text-slate-500 block">{phone.department}</span>
+                      </div>
+                      <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 shrink-0">
+                        {phone.status}
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-600">{phone.description}</p>
+
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100">
+                      <span className="font-mono font-bold text-slate-900 text-sm">
+                        {phone.number}
+                      </span>
+
+                      <div className="flex items-center gap-2">
+                        {phone.isWhatsapp ? (
+                          <a
+                            href={`https://wa.me/${phone.clean}?text=${encodeURIComponent(`Olá! Gostaria de falar com o departamento de ${phone.department} da Morada Digital.`)}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition-colors shadow-xs"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" />
+                            <span>WhatsApp</span>
+                          </a>
+                        ) : null}
+
+                        <a
+                          href={`tel:${phone.clean}`}
+                          className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 transition-colors shadow-xs"
+                        >
+                          <PhoneCall className="w-3.5 h-3.5" />
+                          <span>Ligar</span>
+                        </a>
+
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard(phone.number, phone.label)}
+                          className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer"
+                          title="Copiar número"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                          <span className="hidden sm:inline">Copiar</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Botão Fechar Modal */}
+              <button
+                type="button"
+                onClick={() => setIsPhonesModalOpen(false)}
+                className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition-colors cursor-pointer"
+              >
+                Fechar Janela
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 4. FLOATING MOBILE BOTTOM NAVIGATION BAR (Layout Mobile Especializado) */}
+        <nav 
+          aria-label="Navegação Rápida Móvel"
+          className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-2 py-1.5 shadow-[0_-4px_25px_rgba(0,0,0,0.08)] flex items-center justify-around"
+        >
+          {/* Todos Imóveis */}
+          <button
+            type="button"
+            onClick={() => {
+              setOnlyFavorites(false);
+              const el = document.getElementById('imoveis');
+              el?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="flex flex-col items-center justify-center p-1.5 rounded-xl text-slate-600 hover:text-indigo-600 cursor-pointer min-w-[54px]"
+          >
+            <Home className="w-4 h-4 mb-0.5" />
+            <span className="text-[10px] font-bold">Imóveis</span>
+          </button>
+
+          {/* Comprar */}
+          <button
+            type="button"
+            onClick={() => {
+              setGoal('venda');
+              setOnlyFavorites(false);
+              const el = document.getElementById('imoveis');
+              el?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className={`flex flex-col items-center justify-center p-1.5 rounded-xl cursor-pointer min-w-[54px] ${
+              goal === 'venda' && !onlyFavorites ? 'text-indigo-600 font-extrabold' : 'text-slate-600'
+            }`}
+          >
+            <Building2 className="w-4 h-4 mb-0.5" />
+            <span className="text-[10px]">Comprar</span>
+          </button>
+
+          {/* Alugar */}
+          <button
+            type="button"
+            onClick={() => {
+              setGoal('locacao');
+              setOnlyFavorites(false);
+              const el = document.getElementById('imoveis');
+              el?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className={`flex flex-col items-center justify-center p-1.5 rounded-xl cursor-pointer min-w-[54px] ${
+              goal === 'locacao' && !onlyFavorites ? 'text-indigo-600 font-extrabold' : 'text-slate-600'
+            }`}
+          >
+            <ShieldCheck className="w-4 h-4 mb-0.5" />
+            <span className="text-[10px]">Alugar</span>
+          </button>
+
+          {/* Favoritos */}
+          <button
+            type="button"
+            onClick={() => {
+              setOnlyFavorites(prev => !prev);
+              const el = document.getElementById('imoveis');
+              el?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className={`flex flex-col items-center justify-center p-1.5 rounded-xl cursor-pointer relative min-w-[54px] ${
+              onlyFavorites ? 'text-rose-600 font-extrabold' : 'text-slate-600'
+            }`}
+          >
+            <Heart className={`w-4 h-4 mb-0.5 ${favorites.length > 0 ? 'text-rose-500 fill-rose-500' : ''}`} />
+            <span className="text-[10px]">Salvos</span>
+            {favorites.length > 0 && (
+              <span className="absolute top-0.5 right-2 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center">
+                {favorites.length}
+              </span>
+            )}
+          </button>
+
+          {/* WhatsApp Direct Floating Button */}
+          <a
+            href={`https://wa.me/${MORADA_BRAND.whatsappClean}?text=Ol%C3%A1%2C%20atendimento%20Morada%20Digital`}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/30 transition-transform active:scale-95"
+          >
+            <MessageCircle className="w-4 h-4" />
+            <span className="text-[11px]">Plantão</span>
+          </a>
+        </nav>
 
       </header>
 
@@ -2031,6 +2457,9 @@ export const PublicSite: React.FC = () => {
         isOpen={isListingWizardOpen} 
         onClose={() => setIsListingWizardOpen(false)} 
       />
+
+      {/* GEMINI CHATBOT INTEGRATED WITH GOOGLE MAPS GROUNDING */}
+      <GeminiChatbot />
 
     </div>
   );

@@ -26,9 +26,49 @@ export const MORADA_BRAND = {
   creci: 'CRECI Jurídico nº 104.900-J/MG',
   phone: '(31) 3357-3030', // Telefone Fixo Principal
   landlinePhone: '(31) 3357-3030', // Telefone Fixo
-  whatsapp: '(31) 98427-9865', // Plantão WhatsApp
+  whatsapp: '(31) 98427-9865', // Plantão WhatsApp / Celular Principal
   phoneClean: '3133573030',
   whatsappClean: '5531984279865',
+  secondaryMobile: '(31) 98427-9865',
+  secondaryMobileClean: '5531984279865',
+  contactPhones: [
+    {
+      id: 'vendas_whatsapp',
+      label: 'Plantão Celular & WhatsApp',
+      type: 'celular' as const,
+      department: 'Vendas & Lançamentos',
+      number: '(31) 98427-9865',
+      clean: '5531984279865',
+      isWhatsapp: true,
+      badge: 'Plantão 24h',
+      status: 'Online Agora',
+      description: 'Atendimento ágil para visitas, propostas e negociação rápida.'
+    },
+    {
+      id: 'locacao_celular',
+      label: 'Celular Locação Sem Fiador',
+      type: 'celular' as const,
+      department: 'Aluguel & Garantia Morada',
+      number: '(31) 98427-9865',
+      clean: '5531984279865',
+      isWhatsapp: true,
+      badge: 'Zero Caução',
+      status: 'Disponível',
+      description: 'Análise de ficha em até 2h e repasse garantido ao proprietário dia 12.'
+    },
+    {
+      id: 'sede_fixo',
+      label: 'Telefone Fixo Sede',
+      type: 'fixo' as const,
+      department: 'Jurídico & Base Operacional',
+      number: '(31) 3357-3030',
+      clean: '3133573030',
+      isWhatsapp: false,
+      badge: 'Sede Física',
+      status: 'Seg a Sex: 8h às 18h',
+      description: 'Atendimento institucional, contratos e agendamentos presenciais.'
+    }
+  ],
   email: 'contato@moradadigital.com.br',
   address: 'Rua Pinheiro, 264 - Arvoredo, Contagem - MG',
   cep: '32113-230',
